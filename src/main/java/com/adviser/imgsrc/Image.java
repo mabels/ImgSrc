@@ -1,4 +1,4 @@
-package s2.dimage;
+package com.adviser.imgsrc;
 
 import java.awt.Color;
 import java.awt.Font;
@@ -44,13 +44,15 @@ public class Image {
           | (((val >> 4) & 0xf) | (((val >> 4) & 0xf) << 4)) << 0
           | (((val >> 8) & 0xf) | (((val >> 8) & 0xf) << 4)) << 8
           | (((val >> 12) & 0xf) | (((val >> 12) & 0xf) << 4)) << 16;
+      System.out.println("RGBA:" + Integer.toHexString(val) + ":"
+          + Integer.toHexString(rgb));
+      return new Color(rgb, true);
     } else if (s.length() == 8) {
       rgb = ((val >> 0) & 0xff) << 24 | ((val >> 8) & 0xff) << 0
           | ((val >> 16) & 0xff) << 8 | ((val >> 24) & 0xff) << 16;
+      return new Color(rgb);
     }
-    System.out.println("RGBA:" + Integer.toHexString(val) + ":"
-        + Integer.toHexString(rgb));
-    return new Color(rgb);
+    return new Color(rgb); 
   }
 
   private Color asColor(String s) {
@@ -71,11 +73,11 @@ public class Image {
 
   public static Image fromPath(String path) {
     final val img = new Image();
-    img.setFormat(Format.fromPath(path));
     /*
      * /height/width/backcolor/textcolor/text<.format>
      */
-    path = path.trim().replaceFirst("^/+", "");
+    img.setFormat(Format.fromPath(path));
+    path = img.getFormat().getCleanPath().trim().replaceFirst("^/+", "");
     String[] paths = path.split("[/]+", 0);
     if (paths.length == 1 && paths[0].length() == 0) {
       paths = new String[0];

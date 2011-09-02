@@ -1,9 +1,9 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>s2</groupId>
-	<artifactId>dimage</artifactId>
+	<groupId>com.adviser.imgsrc</groupId>
 	<version>0.0.1-SNAPSHOT</version>
+	<artifactId>imgsrc</artifactId>
 	<name>Dummy Image Producer</name>
 
 	<repositories>
@@ -31,7 +31,7 @@
 							<transformers>
 								<transformer
 									implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-									<mainClass>s2.dimage.DImage</mainClass>
+									<mainClass>com.adviser.imgsrc.Server</mainClass>
 								</transformer>
 								<transformer
 									implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
@@ -43,14 +43,14 @@
 					</execution>
 				</executions>
 			</plugin>
-<plugin> 
-<groupId>org.apache.maven.plugins</groupId> 
-<artifactId>maven-compiler-plugin</artifactId> 
-<configuration> 
-<source>1.5</source> 
-<target>1.5</target> 
-</configuration> 
-</plugin> 
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<source>1.5</source>
+					<target>1.5</target>
+				</configuration>
+			</plugin>
 		</plugins>
 	</build>
 
@@ -62,11 +62,11 @@
 		</dependency>
 
 
-    <dependency>
-        <groupId>net.sf.ehcache</groupId>
-            <artifactId>ehcache-core</artifactId>
-                <version>2.4.3</version>
-                </dependency>
+		<dependency>
+			<groupId>net.sf.ehcache</groupId>
+			<artifactId>ehcache-core</artifactId>
+			<version>2.4.3</version>
+		</dependency>
 
 		<dependency>
 			<groupId>org.projectlombok</groupId>
@@ -75,8 +75,5 @@
 			<scope>provided</scope>
 		</dependency>
 	</dependencies>
-	<!-- <dependency> <groupId></groupId> <artifactId>jai_imageio</artifactId> 
-		<version>1.1</version> <type>java-source</type> </dependency> <dependency> 
-		<groupId>com.sun.media</groupId> <artifactId>jai_imageio</artifactId> <version>1.1</version> 
-		<type>java-source</type> </dependency> -->
+
 </project>

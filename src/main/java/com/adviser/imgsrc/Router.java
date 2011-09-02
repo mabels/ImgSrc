@@ -1,4 +1,4 @@
-package s2.dimage;
+package com.adviser.imgsrc;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -14,19 +14,43 @@ import org.apache.camel.Message;
 import org.apache.camel.builder.RouteBuilder;
 
 public class Router extends RouteBuilder {
-  public void configure() {
-    final String base = "127.0.0.1:1147";
-    from("jetty:http://" + base + "?matchOnUriPrefix=true")
-        .bean(this, "Imager");
+  public class ListenAddress {
+    private String addr = "127.0.0.1";
+    private String port = "1147";
+    public ListenAddress() {      
+    }
+    public ListenAddress(String port, String addr) {
+      this.port = port;
+      if (addr != null) this.addr = addr;
+    }
+    public String toString() {
+      return addr + ":" + port;
+    }
   }
-
+  
+  private ListenAddress listenaddress = null;
+  public Router(String[] args) {
+    if (args.length >= 1) {
+      listenaddress = new ListenAddress(args[0], null);      
+    } else if (args.length >= 2) {
+      listenaddress = new ListenAddress(args[0], args[1]);
+    } else {
+      listenaddress = new ListenAddress();
+    }
+    init();
+  }
   private Cache ehcache;
-
-  public Router() {
+  private void init() {
     final CacheManager manager = CacheManager.create();
     final Cache memoryOnlyCache = new Cache("ImageCache", 1000, false, false, 300, 10);
     manager.addCache(memoryOnlyCache);
     ehcache = manager.getCache("ImageCache");
+  }
+
+  public void configure() {
+    System.out.println("Listen On:"+listenaddress.toString());
+    from("jetty:http://" + listenaddress.toString() + "?matchOnUriPrefix=true")
+        .bean(this, "Imager");
   }
 
   public ByteArrayOutputStream cachedProcessing(Image image) throws IOException {
