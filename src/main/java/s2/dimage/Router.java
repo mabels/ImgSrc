@@ -21,13 +21,14 @@ public class Router extends RouteBuilder {
   }
 
   private Cache ehcache;
+
   public Router() {
-    CacheManager manager = CacheManager.create();
-    Cache memoryOnlyCache = new Cache("ImageCache", 1000, false, false, 60*5, 10);
+    final CacheManager manager = CacheManager.create();
+    final Cache memoryOnlyCache = new Cache("ImageCache", 1000, false, false, 300, 10);
     manager.addCache(memoryOnlyCache);
     ehcache = manager.getCache("ImageCache");
- }
-  
+  }
+
   public ByteArrayOutputStream cachedProcessing(Image image) throws IOException {
     Element element = ehcache.get(image);
     if (element == null) {
@@ -44,16 +45,15 @@ public class Router extends RouteBuilder {
     Message _in = exchange.getIn();
     final String path = _in.getHeader(Exchange.HTTP_PATH, String.class);
     try {
-      Image image = Image.fromPath(path);
+      final Image image = Image.fromPath(path);
       exchange.getOut().setHeader("Content-type", image.getFormat().getMime());
       exchange.getOut().setHeader("Cache-Control", "max-age=315360000");
       exchange.getOut().setHeader("Expires", "Thu, 31 Dec 2037 23:55:55 GMT");
       exchange.getOut().setBody(cachedProcessing(image).toByteArray());
     } catch (IOException e) {
-      // TODO Auto-generated catch block
       exchange.getOut().setHeader(Exchange.HTTP_RESPONSE_CODE, 404);
-      StringWriter sw = new StringWriter();
-      PrintWriter pw = new PrintWriter(sw);
+      final StringWriter sw = new StringWriter();
+      final PrintWriter pw = new PrintWriter(sw);
       e.printStackTrace(pw);
       exchange.getOut().setBody(sw.toString());
       e.printStackTrace();
