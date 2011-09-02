@@ -1,1 +1,34 @@
-not ready
+This programm allows serve dummy images. What is a dummy image.
+A dummy image is used to build prototype web-pages with images included
+with the right dimensions. 
+To use this program first you have to build the webserver with maven
+
+# mvn package
+
+Than you just start the webserver with:
+
+# java -jar target/dimage-<version>.jar <listenaddr|127.0.0.1>:<port|1147>
+
+you could access the images with this url schema
+
+/height/width/backcolor/textcolor/text.format
+
+_ height is a number in pixel max 2048
+_ width is a number in pixel max 2048
+_ backcolor is a hexnumber with 3 or 6 digits or 4 or 6 digits (RGBA) channel
+_ textcolor is a hexnumber with 3 or 6 digits or 4 or 6 digits (RGBA) channel
+_ text is a string if the string is to long nothing will be shown
+_ format is
+  * .png for PNG Images
+  * .jpg for JPEG Images
+  * .gif for GIF Images
+
+it is possible not to specify all values and get all filled up with defaults.
+The defaults are:
+_ height,width 100px
+- backcolor #444444
+- textcolor #ffffff
+_ text <width>x<heigth>
+_ format .png
+
+Thx to sinnerschrader
