@@ -52,7 +52,7 @@ public class Image {
           | ((val >> 16) & 0xff) << 8 | ((val >> 24) & 0xff) << 16;
       return new Color(rgb);
     }
-    return new Color(rgb); 
+    return new Color(rgb);
   }
 
   private Color asColor(String s) {
@@ -88,7 +88,7 @@ public class Image {
     }
     if (paths.length >= 2) {
       try {
-        img.setWidth(Integer.parseInt(paths[1]));
+        img.setHeight(Integer.parseInt(paths[1]));
       } catch (Exception e) {
         img.setTextNoFormat(paths[1]);
       }
