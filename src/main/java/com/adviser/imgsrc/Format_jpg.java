@@ -2,8 +2,10 @@ package com.adviser.imgsrc;
 
 import java.awt.image.BufferedImage;
 
+import lombok.Data;
 
 //@Suffix(".jpg")
+@Data
 class Format_jpg extends Format {
   @SuppressWarnings("unused")
   private String Format = "JPEG";

@@ -89,36 +89,44 @@ public class Image {
     img.setFormat(Format.fromPath(path));
     path = img.getFormat().getCleanPath().trim();
     String[] paths = path.split("/+", 0);
-    if (paths.length == 1 && paths[0].length() == 0) {
-      paths = new String[0];
+    int ofs = 0;
+    if (paths.length > 0 && paths[0].isEmpty()) {
+    	ofs = 1;
+    	if (paths.length == 1 && paths[0].isEmpty()) {
+	      paths = new String[0];
+    	}
+   }
+     if (paths.length >= ofs + 1) {
+         try {
+        	 img.setWidth(Integer.parseInt(paths[ofs + 0]));
+        	 img.setHeight(img.getWidth());
+         } catch (Exception e) {
+        	 img.setText(paths[ofs + 0]);
+         }
     }
-    if (paths.length >= 1) {
-      img.setWidth(Integer.parseInt(paths[0]));
-      img.setHeight(img.getWidth());
-    }
-    if (paths.length >= 2) {
+    if (paths.length >= ofs + 2) {
       try {
-        img.setWidth(Integer.parseInt(paths[1]));
+        img.setWidth(Integer.parseInt(paths[ofs + 1]));
       } catch (Exception e) {
-        img.setText(paths[1]);
+        img.setText(paths[ofs + 1]);
       }
     }
-    if (paths.length >= 3) {
-      val color = img.asColor(paths[2]);
+    if (paths.length >= ofs + 3) {
+      val color = img.asColor(paths[ofs + 2]);
       if (color != null)
         img.setBackcolor(color);
       else
-        img.setText(paths[2]);
+        img.setText(paths[ofs + 2]);
     }
-    if (paths.length >= 4) {
-      val color = img.asColor(paths[3]);
+    if (paths.length >= ofs + 4) {
+      val color = img.asColor(paths[ofs + 3]);
       if (color != null)
         img.setTextcolor(color);
       else
-        img.setText(paths[3]);
+        img.setText(paths[ofs + 3]);
     }
-    if (paths.length >= 5) {
-      img.setText(paths[4]);
+    if (paths.length >= ofs + 5) {
+      img.setText(paths[ofs + 4]);
     }
 
     return img;

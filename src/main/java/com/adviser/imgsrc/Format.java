@@ -12,13 +12,21 @@ import lombok.Data;
 import lombok.val;
 
 @Data
-class Format {
+abstract class Format {
+	 abstract public String getFormat();
+	 abstract public String getMime();
+	 abstract public int getColorSpace();
+	 abstract public void setColorSpace(int s);
+	 abstract public String getSuffix();
+	 
+	 private String cleanPath;
+  /*
   private String format;
   private String mime;
   private int colorSpace;
-  private String cleanPath;
   private String suffix;
-  
+  */
+  //private String cleanPath;
   /*
   public void setCleanPath(String path) {
     cleanPath = path.replaceAll(formatPattern() , "");
@@ -56,15 +64,15 @@ class Format {
     }
     return _factory;
   }
-  private static Pattern _suffix = Pattern.compile("(\\.\\p{Alnum}{3})");
+  private static Pattern _suffix = Pattern.compile("(.*)(\\.\\w{3})(.*)");
   public static Format fromPath(String path) {
     
     Format ret = null;
     Matcher suffix = _suffix.matcher(path);
     if (suffix.matches()) {
-      ret = factory().get(suffix.group(1));
+      ret = factory().get(suffix.group(2));
       if (ret != null) {
-        path = suffix.replaceFirst("");
+        path = suffix.group(1)+suffix.group(3);
       }
     }
     if (ret == null) {

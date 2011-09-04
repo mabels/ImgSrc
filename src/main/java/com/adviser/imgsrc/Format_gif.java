@@ -2,8 +2,10 @@ package com.adviser.imgsrc;
 
 import java.awt.image.BufferedImage;
 
+import lombok.Data;
 
 //@Suffix(".gif")
+@Data
 class Format_gif extends Format {
   @SuppressWarnings("unused")
   private String Format = "GIF";
