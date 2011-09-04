@@ -2,42 +2,75 @@ package com.adviser.imgsrc;
 
 import java.awt.image.BufferedImage;
 
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.regex.Pattern;
+import java.util.regex.Matcher;
+
+
 import lombok.Data;
 import lombok.val;
 
 @Data
 class Format {
-  private String Format;
-  private String Mime;
-  private int ColorSpace;
+  private String format;
+  private String mime;
+  private int colorSpace;
   private String cleanPath;
-  public void setCleanPath(String path) {
-    cleanPath = path.replaceAll("\\.(jpg|png|gif)", "");
-  }
+  private String suffix;
   
+  /*
+  public void setCleanPath(String path) {
+    cleanPath = path.replaceAll(formatPattern() , "");
+  }
+
+  private String _formatPattern = null;
+  public String formatPattern() {
+    if (_formatPattern != null) return _formatPattern;
+    
+    String pattern = "(";
+    Iterator<Format> formats = factory().values().iterator();
+    String or = "";
+    while(formats.hasNext()) {
+      String suffix = formats.next().getSuffix();
+      pattern = pattern + Pattern.quote(suffix) + or;
+      or = "|";
+    }
+    pattern += ")";
+    _formatPattern = pattern;
+    return _formatPattern;
+  }
+  */
+  private static HashMap<String, Format> _factory = null;
+  
+  private static HashMap<String, Format> factory() {
+    if (_factory == null) {
+      _factory = new HashMap<String, Format>();
+      Format tmp;
+      tmp = new Format_png();
+      _factory.put(tmp.getSuffix(), tmp);
+      tmp = new Format_jpg();
+      _factory.put(tmp.getSuffix(), tmp);
+      tmp = new Format_gif();
+      _factory.put(tmp.getSuffix(), tmp);
+    }
+    return _factory;
+  }
+  private static Pattern _suffix = Pattern.compile("(\\.\\p{Alnum}{3})");
   public static Format fromPath(String path) {
-    /* ugly */
-    if (path.indexOf(".jpg") >= 0) {
-      final val ret = new Format();
-      ret.setCleanPath(path);
-      ret.setFormat("JPEG");
-      ret.setMime("image/jpeg");
-      ret.setColorSpace(BufferedImage.TYPE_INT_RGB);
-      return ret;
+    
+    Format ret = null;
+    Matcher suffix = _suffix.matcher(path);
+    if (suffix.matches()) {
+      ret = factory().get(suffix.group(1));
+      if (ret != null) {
+        path = suffix.replaceFirst("");
+      }
     }
-    if (path.indexOf(".png") >= 0) {
-      final val ret = new Format();
-      ret.setCleanPath(path);
-      ret.setFormat("PNG");
-      ret.setMime("image/png");
-      ret.setColorSpace(BufferedImage.TYPE_INT_RGB);
-      return ret;
+    if (ret == null) {
+      ret = factory().get(".gif");
     }
-    final val ret = new Format();
     ret.setCleanPath(path);
-    ret.setFormat("GIF");
-    ret.setMime("image/gif");
-    ret.setColorSpace(BufferedImage.TYPE_INT_RGB);
     return ret;
   }
 }

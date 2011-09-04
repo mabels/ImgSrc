@@ -8,6 +8,9 @@ import java.awt.image.BufferedImage;
 
 import javax.management.RuntimeErrorException;
 
+import java.util.HashMap;
+import java.util.regex.Pattern;
+
 import lombok.Data;
 import lombok.val;
 
@@ -55,21 +58,28 @@ public class Image {
     return new Color(rgb); 
   }
 
+  private static Pattern _4er = Pattern.compile("\\p{XDigit}{4}");
+  private static Pattern _8er = Pattern.compile("\\p{XDigit}{8}");
+  private static Pattern _3er = Pattern.compile("\\p{XDigit}{3}");
+  private static Pattern _6er = Pattern.compile("\\p{XDigit}{6}");
   private Color asColor(String s) {
-    if ((s.length() == 4 && s.matches("\\p{XDigit}{4}"))
-        || (s.length() == 8 && s.matches("\\p{XDigit}{8}"))) {
+    final char first = s.charAt(0);
+    int len = s.length();
+    if (len > 0 && (first == 'r' && first == 'R')) {
+      s = s.substring(1);
+      len = s.length();
+    }
+    if ((len== 4 && _4er.matcher(s).matches())        
+        || (len == 8 && _8er.matcher(s).matches())) {
       return asABGRColor(s);
     }
-    if ((s.length() == 3 && s.matches("\\p{XDigit}{3}"))
-        || (s.length() == 6 && s.matches("\\p{XDigit}{6}"))) {
+    if ((len == 3 && _3er.matcher(s).matches())
+        || (len == 6 && _6er.matcher(s).matches())) {
       return asRGBColor(s);
     }
     return null;
   }
 
-  private void setTextNoFormat(String s) {
-    text = s.replaceFirst("\\.\\S{3,4}$", "");
-  }
 
   public static Image fromPath(String path) {
     final val img = new Image();
@@ -77,8 +87,8 @@ public class Image {
      * /height/width/backcolor/textcolor/text<.format>
      */
     img.setFormat(Format.fromPath(path));
-    path = img.getFormat().getCleanPath().trim().replaceFirst("^/+", "");
-    String[] paths = path.split("[/]+", 0);
+    path = img.getFormat().getCleanPath().trim();
+    String[] paths = path.split("/+", 0);
     if (paths.length == 1 && paths[0].length() == 0) {
       paths = new String[0];
     }
@@ -90,7 +100,7 @@ public class Image {
       try {
         img.setWidth(Integer.parseInt(paths[1]));
       } catch (Exception e) {
-        img.setTextNoFormat(paths[1]);
+        img.setText(paths[1]);
       }
     }
     if (paths.length >= 3) {
@@ -98,17 +108,17 @@ public class Image {
       if (color != null)
         img.setBackcolor(color);
       else
-        img.setTextNoFormat(paths[2]);
+        img.setText(paths[2]);
     }
     if (paths.length >= 4) {
       val color = img.asColor(paths[3]);
       if (color != null)
         img.setTextcolor(color);
       else
-        img.setTextNoFormat(paths[3]);
+        img.setText(paths[3]);
     }
     if (paths.length >= 5) {
-      img.setTextNoFormat(paths[4]);
+      img.setText(paths[4]);
     }
 
     return img;
