@@ -3,17 +3,16 @@ package com.adviser.imgsrc;
 import java.awt.image.BufferedImage;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 //@Suffix(".jpg")
 @Data
+@EqualsAndHashCode(callSuper=false)
+
 class Format_jpg extends Format {
-  @SuppressWarnings("unused")
   private String Format = "JPEG";
-  @SuppressWarnings("unused")
   private String Mime = "image/jpeg";
-  @SuppressWarnings("unused")
   private int ColorSpace = BufferedImage.TYPE_INT_RGB;
-  @SuppressWarnings("unused")
   private String suffix = ".jpg";
 
 }

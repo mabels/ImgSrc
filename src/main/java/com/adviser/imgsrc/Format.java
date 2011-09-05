@@ -1,15 +1,10 @@
 package com.adviser.imgsrc;
 
-import java.awt.image.BufferedImage;
-
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.regex.Pattern;
 import java.util.regex.Matcher;
-
+import java.util.regex.Pattern;
 
 import lombok.Data;
-import lombok.val;
 
 @Data
 abstract class Format {
