@@ -6,6 +6,7 @@ import java.awt.FontMetrics;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.util.Random;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.management.RuntimeErrorException;
@@ -109,6 +110,16 @@ public class Image {
 	  sb.append(this.getFormat().getSuffix());
 	  return sb.toString();
 	}
+	private boolean frame = false;
+	private static Pattern _frame = Pattern.compile("(.*)\\.[xX](.*)");
+	private String hasFrame(String path) {
+	  Matcher match = _frame.matcher(path);
+	  if (match.matches()) {
+	    frame = true;
+	    return match.group(1) + match.group(2);
+	  }
+	  return path;
+	}
 	
 	private static Pattern _split = Pattern.compile("/+");
 	public static Image fromPath(String path) {
@@ -118,6 +129,7 @@ public class Image {
 		 */
 		img.setFormat(Format.fromPath(path));
 		path = img.getFormat().getCleanPath().trim();
+		path = img.hasFrame(path);
 		String[] paths = _split.split(path, 0);
 		int ofs = 0;
 		if (paths.length > 0 && paths[0].isEmpty()) {
@@ -198,8 +210,19 @@ public class Image {
 		final BufferedImage image = new BufferedImage(width, height,
 				this.format.getColorSpace());
 		final Graphics2D graph = image.createGraphics();
-		graph.setPaint(backcolor);
-		graph.fillRect(0, 0, width, height);
+		if (this.isFrame()) {
+      graph.setPaint(textcolor);
+      graph.fillRect(0, 0, width, height);
+      graph.setPaint(backcolor);
+      graph.fillRect(5, 5, width-10, height-10);
+      graph.setPaint(textcolor);
+      graph.drawLine(0, 0, width, height);
+      graph.drawLine(width, 0, 0, height);
+		  
+		} else {
+	    graph.setPaint(backcolor);
+		  graph.fillRect(0, 0, width, height);
+		}
 		graph.setColor(textcolor);
 		drawCenteredString(this.getText(), width, height, graph);
 		return image;
