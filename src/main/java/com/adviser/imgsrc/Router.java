@@ -59,7 +59,7 @@ public class Router extends RouteBuilder {
         300, 10);
     manager.addCache(memoryOnlyCache);
     ehcache = manager.getCache("ImageCache");
-  }
+   }
 
   public void configure() {
     System.out.println("Version:" + Router.getServer());
@@ -71,9 +71,7 @@ public class Router extends RouteBuilder {
   public ByteArrayOutputStream cachedProcessing(Image image) throws IOException {
     Element element = ehcache.get(image);
     if (element == null) {
-      ByteArrayOutputStream out = new ByteArrayOutputStream();
-      javax.imageio.ImageIO.write(image.drawImage(), image.getFormat()
-          .getFormat(), out);
+      ByteArrayOutputStream out = image.getStream();
       element = new Element(image, out);
       ehcache.put(element);
     }
@@ -123,13 +121,16 @@ public class Router extends RouteBuilder {
       final String path = _in.getHeader(Exchange.HTTP_PATH, String.class);// ,
                                                                           // "application/x-www-form-urlencoded");
       final Message _out = exchange.getOut();
-      System.out.println("Path:" + path + ":" + path.codePointAt(1));
+      System.out.println("Path:" + path);
       _out.setHeader("Server", getServer());
       if (path.startsWith("/test.html")) {
         testHtml(exchange);
         return;
       }
-      final Image image = Image.fromPath(path);
+      Image image = Image.fromPath(path);
+      if (path.startsWith("/favicon.ico")) {
+        image = Image.fromPath("/16/16/a00/000/favicon.ico");
+      }
       if (image.isRedirect()) {
         _out.setHeader(Exchange.HTTP_RESPONSE_CODE, 302);
         final String location = image.getPath();

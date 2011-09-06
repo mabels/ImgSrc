@@ -5,6 +5,8 @@ import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -200,6 +202,10 @@ public class Image {
 			}
 			proz -= 5;
 		}
+	}
+	
+	public ByteArrayOutputStream getStream() throws IOException {
+	  return getFormat().getStream(drawImage());
 	}
 
 	public BufferedImage drawImage() {

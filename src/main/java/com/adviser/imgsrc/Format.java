@@ -1,5 +1,8 @@
 package com.adviser.imgsrc;
 
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -38,6 +41,11 @@ abstract class Format {
     return _factory;
   }
 
+  public ByteArrayOutputStream getStream(BufferedImage img) throws IOException {
+    ByteArrayOutputStream ret = new ByteArrayOutputStream();
+    javax.imageio.ImageIO.write(img, getFormat(), ret);
+    return ret;
+  }
   private static Pattern _suffix = Pattern.compile("(.*)(\\.\\w{3})(.*)");
 
   public static Format fromPath(String path) {
