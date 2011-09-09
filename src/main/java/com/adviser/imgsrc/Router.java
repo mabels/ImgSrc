@@ -132,15 +132,16 @@ public class Router extends RouteBuilder {
         image = Image.fromPath("/16/16/a00/000/favicon.ico");
       }
       if (image.isRedirect()) {
-        _out.setHeader(Exchange.HTTP_RESPONSE_CODE, 302);
         final String location = image.getPath();
         _out.setHeader("Location", location);
-        _out.setHeader("Cache-Control", "no-cache");
-        _out.setBody("redirect to:" + location);
+        _out.setHeader("cache-control", constant("no-cache"));
+        _out.setHeader("pragma", constant("no-cache"));
+        _out.setHeader(Exchange.HTTP_RESPONSE_CODE, 302);
+        _out.setBody("redirect to:" + location+"\n");
       } else {
         _out.setHeader("Content-type", image.getFormat().getMime());
-        _out.setHeader("Cache-Control", "max-age=315360000");
-        _out.setHeader("Expires", "Thu, 31 Dec 2037 23:55:55 GMT");
+        _out.setHeader("cache-control", constant("max-age=315360000"));
+        _out.setHeader("expires", "Thu, 31 Dec 2037 23:55:55 GMT");
         byte[] img = cachedProcessing(image).toByteArray();
         _out.setHeader("Length", img.length);
         _out.setBody(img);

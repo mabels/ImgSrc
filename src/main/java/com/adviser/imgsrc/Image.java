@@ -152,7 +152,12 @@ public class Image {
 			try {
 				img.setHeight(Integer.parseInt(paths[ofs + 1]));
 			} catch (Exception e) {
-				img.setText(paths[ofs + 1]);
+			  val color = img.asColor(paths[ofs + 1]);
+			  if (color != null) {
+	        img.setBackcolor(color);			    
+			  } else {
+			    img.setText(paths[ofs + 1]);
+			  }
 			}
 		}
 		if (paths.length >= ofs + 3) {
@@ -176,9 +181,14 @@ public class Image {
 		return img;
 	}
 
+	private static Pattern _space = Pattern.compile("^[\\._\\-\\*\\+ ]$");
 	public String getText() {
-		if (text != null)
+		if (text != null) {
+		  if (_space.matcher(text).matches()) {
+		    return "";
+		  }
 			return text;
+		}
 		return "" + width + "x" + height;
 	}
 

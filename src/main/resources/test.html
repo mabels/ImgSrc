@@ -3,9 +3,18 @@
 <title>Test Alpha Page</title>
 </head>
 <body style="background:#CCC" />
+<img src="/200/a00/a0g.png" />
+<img src="/200/aa0000/a0000g.png" />
+<img src="/200/aa0000/a0000g.X.png" />
+<img src="/200/aa0000/_.X.png" />
+<br/>
 <img src="/200/100/a00/0a0/png.png" />
 <img src="/200/100/0a0/00a/gif.gif" />
 <img src="/200/100/00a/a00/jpg.jpg" />
+<br/>
+<img src="/200/100/a00/0a0/png.X.png" />
+<img src="/200/100/0a0/00a/gif.X.gif" />
+<img src="/200/100/00a/a00/jpg.X.jpg" />
 <br/>
 <img src="/200/100/Ra00/rand.png" />
 <img src="/200/100/Ra00/rand.png" />
@@ -47,7 +56,7 @@
 <script type="application/javascript">
 	$("img").each(function() {	
 		var $img = $(this)
-		var title = $img.attr("src").replace(/.*\//,"").replace(/\.\S{3}$/, "");
+		var title = $img.attr("src")//.replace(/.*\//,"").replace(/\.\S{3}$/, "");
 		var $block = $("<div></div>").append($img.clone()).append("<span>"+title+"</span>")
 		$img.replaceWith($block);
 	})
