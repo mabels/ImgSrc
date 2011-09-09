@@ -152,7 +152,7 @@ public class Image {
 			try {
 				img.setHeight(Integer.parseInt(paths[ofs + 1]));
 			} catch (Exception e) {
-			  val color = img.asColor(paths[ofs + 1]);
+			  Color color = img.asColor(paths[ofs + 1]);
 			  if (color != null) {
 	        img.setBackcolor(color);			    
 			  } else {
