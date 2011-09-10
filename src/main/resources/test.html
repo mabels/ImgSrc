@@ -56,8 +56,8 @@
 <script type="application/javascript">
 	$("img").each(function() {	
 		var $img = $(this)
-		var title = $img.attr("src")//.replace(/.*\//,"").replace(/\.\S{3}$/, "");
-		var $block = $("<div></div>").append($img.clone()).append("<span>"+title+"</span>")
+		var title = $img.attr("src");
+		var $block = $("<div></div>").append($img.clone()).append("<span><a href='"+title+"' target='_blank'>"+title+"</a></span>")
 		$img.replaceWith($block);
 	})
 
