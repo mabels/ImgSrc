@@ -15,10 +15,11 @@ abstract class Format {
 
   abstract public String getMime();
 
+  /*
   abstract public int getColorSpace();
 
   abstract public void setColorSpace(int s);
-
+  */
   abstract public String getSuffix();
 
   private String cleanPath;
