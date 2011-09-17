@@ -24,13 +24,17 @@ public class Image {
   private Color backcolor = new Color(0x444444);
   private Color textcolor = new Color(0xffffff);
   private String text = null;
-  @SuppressWarnings("unused")
   private String path;
 
   private Format format = null;
 
+  public boolean orRedirect(boolean val) {
+    redirect |= val;
+    return redirect;
+  }
 
-  public String getPath() {
+
+  public String getFullPath() {
     final StringBuffer sb = new StringBuffer();
     sb.append("/");
     sb.append(Integer.toString(this.getWidth()));

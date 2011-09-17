@@ -3,7 +3,7 @@ package com.adviser.imgsrc;
 import org.apache.camel.CamelContext;
 import org.apache.camel.component.jetty.JettyHttpComponent;
 import org.apache.camel.impl.DefaultCamelContext;
-import org.apache.camel.impl.DefaultHeaderFilterStrategy;
+import org.apache.camel.spi.HeaderFilterStrategy;
 
 public class Server {
 
@@ -11,7 +11,8 @@ public class Server {
     final CamelContext camelContext = new DefaultCamelContext();
     camelContext.disableJMX();
     JettyHttpComponent jhc = new JettyHttpComponent();
-    jhc.setHeaderFilterStrategy(new DefaultHeaderFilterStrategy());
+    HeaderFilterStrategy hfs = new MyFilterStrategy();
+    jhc.setHeaderFilterStrategy(hfs);
     camelContext.addComponent("jetty", jhc);
     try {
       camelContext.addRoutes(new Router(args));

@@ -12,11 +12,13 @@ public class IsWhat {
   private Integer dim = null;
   private Color color = null;
   private String text = null;
+  private boolean redirect = false;
 
   public boolean assignBackColor(Image img) {
     if (getColor() != null) {
       img.setBackcolor(getColor());
       img.setTextcolor(asInvertColor(getColor()));
+      img.orRedirect(this.isRedirect());
       return true;
     }
     return false;
@@ -25,6 +27,7 @@ public class IsWhat {
   public Step<Image> assignText(Image img) {
     if (getText() != null) {
       img.setText(getText());
+      img.orRedirect(this.isRedirect());
     }
     return null;
   }
@@ -84,7 +87,7 @@ public class IsWhat {
     int len = s.length();
     boolean random = false;
     if (len > 0 && (first == 'r' || first == 'R')) {
-      // this.setRedirect(true);
+      this.setRedirect(true);
       s = s.substring(1);
       len = s.length();
       random = true;
