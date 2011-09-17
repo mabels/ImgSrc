@@ -3,32 +3,23 @@ package com.adviser.imgsrc;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.HashMap;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import lombok.Data;
-
-@Data
+//@Data
 abstract class Format {
   abstract public String getFormat();
-
   abstract public String getMime();
-
-  /*
-  abstract public int getColorSpace();
-
-  abstract public void setColorSpace(int s);
-  */
   abstract public String getSuffix();
 
-  private String cleanPath;
+  //private String cleanPath;
 
-  private static HashMap<String, Format> _factory = null;
+  private static Map<String, Format> _factory = null;
 
-  private static HashMap<String, Format> factory() {
+  private static Map<String, Format> factory() {
     if (_factory == null) {
-      _factory = new HashMap<String, Format>();
+      _factory = new java.util.concurrent.ConcurrentHashMap<String, Format>();
       Format tmp;
       tmp = new Format_png();
       _factory.put(tmp.getSuffix(), tmp);
@@ -49,7 +40,7 @@ abstract class Format {
   }
   private static Pattern _suffix = Pattern.compile("(.*)(\\.\\w{3})(.*)");
 
-  public static Format fromPath(String path) {
+  public static Format fromPath(String path, Image img) {
 
     Format ret = null;
     Matcher suffix = _suffix.matcher(path);
@@ -62,7 +53,7 @@ abstract class Format {
     if (ret == null) {
       ret = factory().get(".gif");
     }
-    ret.setCleanPath(path);
+    img.setPath(path.trim());
     return ret;
   }
 }

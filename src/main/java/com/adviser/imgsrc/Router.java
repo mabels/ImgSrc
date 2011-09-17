@@ -59,10 +59,10 @@ public class Router extends RouteBuilder {
         300, 10);
     manager.addCache(memoryOnlyCache);
     ehcache = manager.getCache("ImageCache");
-   }
+  }
 
   public void configure() {
-    System.out.println("Version:" + Router.getServer());
+    System.out.println("Version:" + getServer());
     System.out.println("Listen On:" + listenaddress.toString());
     from("jetty:http://" + listenaddress.toString() + "?matchOnUriPrefix=true")
         .bean(this, "Imager");
@@ -80,37 +80,49 @@ public class Router extends RouteBuilder {
 
   // private static CharsetDecoder decoder =
   // Charset.forName("ISO-8859-1").newDecoder();
-  private static String _version = null;
+  private String _version = null;
 
-  private static String getServer() {
-    if (_version != null)
+  private String getServer() {
+    if (_version != null) {
       return _version;
-
-    _version = "ImgSrv(development)";
-    final InputStream is = Router.class.getClassLoader().getResourceAsStream(
-        "META-INF/maven/com.adviser.imgsrc/imgsrc/pom.xml");
-    if (is != null) {
-      DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-      Document doc;
-      try {
-        DocumentBuilder db = dbf.newDocumentBuilder();
-        doc = db.parse(is);
-        _version = "ImgSrv("
-            + doc.getElementsByTagName("version").item(0).getTextContent()
-            + ")";
-      } catch (Exception e) {
-        // System.out.println("IS:"+e.getMessage());
+    }
+    synchronized (this) {
+      if (_version != null) {
+        return _version;
       }
+      String version = "ImgSrv(development)";
+      final InputStream is = Router.class.getClassLoader().getResourceAsStream(
+          "META-INF/maven/com.adviser.imgsrc/imgsrc/pom.xml");
+      if (is != null) {
+        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+        Document doc;
+        try {
+          DocumentBuilder db = dbf.newDocumentBuilder();
+          doc = db.parse(is);
+          version = "ImgSrv("
+              + doc.getElementsByTagName("version").item(0).getTextContent()
+              + ")";
+        } catch (Exception e) {
+          // System.out.println("IS:"+e.getMessage());
+        }
+      }
+      _version = version;
     }
     return _version;
   }
 
   private String _testHtml = null;
+
   private void testHtml(Exchange exchange) throws IOException {
     if (_testHtml == null) {
-      final InputStream is = Router.class.getClassLoader().getResourceAsStream(
-          "test.html");
-      _testHtml = IOUtils.toString(is);
+      synchronized (this) {
+        if (_testHtml == null) {
+          final InputStream is = Router.class.getClassLoader()
+              .getResourceAsStream("test.html");
+          _testHtml = IOUtils.toString(is);
+          System.out.println("FETCH test.html");
+        }
+      }
     }
     exchange.getOut().setBody(_testHtml);
   }
@@ -121,7 +133,7 @@ public class Router extends RouteBuilder {
       final String path = _in.getHeader(Exchange.HTTP_PATH, String.class);// ,
                                                                           // "application/x-www-form-urlencoded");
       final Message _out = exchange.getOut();
-      System.out.println("Path:" + path);
+      // System.out.println("Path:" + path);
       _out.setHeader("Server", getServer());
       if (path.startsWith("/test.html")) {
         testHtml(exchange);
@@ -137,13 +149,13 @@ public class Router extends RouteBuilder {
         _out.setHeader("cache-control", constant("no-cache"));
         _out.setHeader("pragma", constant("no-cache"));
         _out.setHeader(Exchange.HTTP_RESPONSE_CODE, 302);
-        _out.setBody("redirect to:" + location+"\n");
+        _out.setBody("redirect to:" + location + "\n");
       } else {
         _out.setHeader("Content-type", image.getFormat().getMime());
         _out.setHeader("cache-control", constant("max-age=315360000"));
         _out.setHeader("expires", "Thu, 31 Dec 2037 23:55:55 GMT");
         byte[] img = cachedProcessing(image).toByteArray();
-        _out.setHeader("Length", img.length);
+        // _out.setHeader("Length", img.length);
         _out.setBody(img);
       }
     } catch (Exception e) {

@@ -24,6 +24,8 @@ public class Image {
   private Color backcolor = new Color(0x444444);
   private Color textcolor = new Color(0xffffff);
   private String text = null;
+  @SuppressWarnings("unused")
+  private String path;
 
   private Format format = null;
 
@@ -123,8 +125,8 @@ public class Image {
     /*
      * /height/width/backcolor/textcolor/text<.format>
      */
-    img.setFormat(Format.fromPath(path));
-    path = img.getFormat().getCleanPath().trim();
+    img.setFormat(Format.fromPath(path, img));
+    path = img.getPath();
     path = img.hasFrame(path);
 
     LinkedList<String> datas = Steps.splitPath(path);
