@@ -9,9 +9,9 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper=false)
 
 class Format_png extends Format {
-  private String Format = "PNG";
-  private String Mime = "image/png";
-  private int ColorSpace = BufferedImage.TYPE_INT_RGB;
+  private String format = "PNG";
+  private String mime = "image/png";
+  private int colorSpace = BufferedImage.TYPE_INT_RGB;
   private String suffix = ".png";
 
 }

@@ -24,7 +24,7 @@ public class Image {
   private Color backcolor = new Color(0x444444);
   private Color textcolor = new Color(0xffffff);
   private String text = null;
-  private String path;
+  private String path = null;
 
   private Format format = null;
 

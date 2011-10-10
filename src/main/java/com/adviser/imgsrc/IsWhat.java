@@ -75,12 +75,12 @@ public class IsWhat {
     return new Color(rgb);
   }
 
-  private static Random rand = new Random(System.currentTimeMillis());
+  private static final Random rand = new Random(System.currentTimeMillis());
 
-  private static Pattern _4er = Pattern.compile("\\p{XDigit}{4}");
-  private static Pattern _8er = Pattern.compile("\\p{XDigit}{8}");
-  private static Pattern _3er = Pattern.compile("\\p{XDigit}{3}");
-  private static Pattern _6er = Pattern.compile("\\p{XDigit}{6}");
+  private static final Pattern re4er = Pattern.compile("\\p{XDigit}{4}");
+  private static final Pattern re8er = Pattern.compile("\\p{XDigit}{8}");
+  private static final Pattern re3er = Pattern.compile("\\p{XDigit}{3}");
+  private static final Pattern re6er = Pattern.compile("\\p{XDigit}{6}");
 
   private Color asColor(String s) {
     final char first = s.charAt(0);
@@ -93,20 +93,21 @@ public class IsWhat {
       random = true;
     }
     Color ret = null;
-    if ((len == 4 && _4er.matcher(s).matches())
-        || (len == 8 && _8er.matcher(s).matches())) {
+    if ((len == 4 && re4er.matcher(s).matches())
+        || (len == 8 && re8er.matcher(s).matches())) {
       ret = asABGRColor(s);
-    } else if ((len == 3 && _3er.matcher(s).matches())
-        || (len == 6 && _6er.matcher(s).matches())) {
+    } else if ((len == 3 && re3er.matcher(s).matches())
+        || (len == 6 && re6er.matcher(s).matches())) {
       ret = asRGBColor(s);
     }
     if (random && ret != null) {
       int r = rand.nextInt() & 0xf;
       for (int i = 0; i < r; ++i) {
-        if ((r & 0x8) != 0)
+        if ((r & 0x8) != 0) {
           ret = ret.brighter();
-        else
+        } else {
           ret = ret.darker();
+        }
       }
     }
     return ret;
@@ -114,9 +115,9 @@ public class IsWhat {
 
   public IsWhat(String data) {
     try {
-      Integer _dim = new Integer(Integer.parseInt(data));
-      if (0 < _dim.intValue() && _dim.intValue() < 2000) {
-        setDim(_dim);
+      Integer dim = new Integer(Integer.parseInt(data));
+      if (0 < dim.intValue() && dim.intValue() < 2000) {
+        setDim(dim);
       }
     } catch (Exception e) {
       color = asColor(data);

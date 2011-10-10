@@ -10,9 +10,9 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper=false)
 
 class Format_jpg extends Format {
-  private String Format = "JPEG";
-  private String Mime = "image/jpeg";
-  private int ColorSpace = BufferedImage.TYPE_INT_RGB;
+  private String format = "JPEG";
+  private String mime = "image/jpeg";
+  private int colorSpace = BufferedImage.TYPE_INT_RGB;
   private String suffix = ".jpg";
 
 }

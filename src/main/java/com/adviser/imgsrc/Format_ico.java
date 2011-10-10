@@ -13,9 +13,9 @@ import net.sf.image4j.codec.ico.ICOEncoder;
 @EqualsAndHashCode(callSuper=false)
 
 class Format_ico extends Format {
-  private String Format = "ICO";
-  private String Mime = "image/x-icon";
-  private int ColorSpace = BufferedImage.TYPE_INT_RGB;
+  private String format = "ICO";
+  private String mime = "image/x-icon";
+  private int colorSpace = BufferedImage.TYPE_INT_RGB;
   private String suffix = ".ico";
 
   public ByteArrayOutputStream getStream(BufferedImage img) throws IOException {

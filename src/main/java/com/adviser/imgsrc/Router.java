@@ -29,8 +29,9 @@ public class Router extends RouteBuilder {
 
     public ListenAddress(String port, String addr) {
       this.port = port;
-      if (addr != null)
+      if (addr != null) {
         this.addr = addr;
+      }
     }
 
     public String toString() {
@@ -80,15 +81,15 @@ public class Router extends RouteBuilder {
 
   // private static CharsetDecoder decoder =
   // Charset.forName("ISO-8859-1").newDecoder();
-  private String _version = null;
+  private String version = null;
 
   private String getServer() {
-    if (_version != null) {
-      return _version;
+    if (version != null) {
+      return version;
     }
     synchronized (this) {
-      if (_version != null) {
-        return _version;
+      if (version != null) {
+        return version;
       }
       String version = "ImgSrv(development)";
       final InputStream is = Router.class.getClassLoader().getResourceAsStream(
@@ -106,35 +107,33 @@ public class Router extends RouteBuilder {
           // System.out.println("IS:"+e.getMessage());
         }
       }
-      _version = version;
+      this.version = version;
     }
-    return _version;
+    return version;
   }
 
-  private String _testHtml = null;
+  private String testHtml = null;
 
   private void testHtml(Exchange exchange) throws IOException {
-    if (_testHtml == null) {
-      synchronized (this) {
-        if (_testHtml == null) {
-          final InputStream is = Router.class.getClassLoader()
-              .getResourceAsStream("test.html");
-          _testHtml = IOUtils.toString(is);
-          System.out.println("FETCH test.html");
-        }
+    synchronized (this) {
+      if (testHtml == null) {
+        final InputStream is = Router.class.getClassLoader()
+            .getResourceAsStream("test.html");
+        testHtml = IOUtils.toString(is);
+        System.out.println("FETCH test.html");
       }
     }
     exchange.getOut().setHeader("Content-Type", "text/html");
-    exchange.getOut().setBody(_testHtml);
+    exchange.getOut().setBody(testHtml);
   }
 
   public void Imager(Exchange exchange) {
-    final Message _in = exchange.getIn();
+    final Message in = exchange.getIn();
     try {
-      final String path = _in.getHeader(Exchange.HTTP_PATH, String.class);
-      final Message _out = exchange.getOut();
+      final String path = in.getHeader(Exchange.HTTP_PATH, String.class);
+      final Message out = exchange.getOut();
       // System.out.println("Path:" + path);
-      _out.setHeader("Server", getServer());
+      out.setHeader("Server", getServer());
       if (path.startsWith("/test.html")) {
         testHtml(exchange);
         return;
@@ -145,18 +144,18 @@ public class Router extends RouteBuilder {
       }
       if (image.isRedirect()) {
         final String location = image.getFullPath();
-        _out.setHeader("location", location);
-        _out.setHeader("cache-control", constant("no-cache"));
-        _out.setHeader("pragma", constant("no-cache"));
-        _out.setHeader(Exchange.HTTP_RESPONSE_CODE, 302);
-        _out.setBody("redirect to:" + location + "\n");
+        out.setHeader("location", location);
+        out.setHeader("cache-control", constant("no-cache"));
+        out.setHeader("pragma", constant("no-cache"));
+        out.setHeader(Exchange.HTTP_RESPONSE_CODE, 302);
+        out.setBody("redirect to:" + location + "\n");
       } else {
-        _out.setHeader("Content-Type", image.getFormat().getMime());
-        _out.setHeader("cache-control", constant("max-age=315360000"));
-        _out.setHeader("expires", "Thu, 31 Dec 2037 23:55:55 GMT");
+        out.setHeader("Content-Type", image.getFormat().getMime());
+        out.setHeader("cache-control", constant("max-age=315360000"));
+        out.setHeader("expires", "Thu, 31 Dec 2037 23:55:55 GMT");
         byte[] img = cachedProcessing(image).toByteArray();
         // _out.setHeader("Length", img.length);
-        _out.setBody(img);
+        out.setBody(img);
       }
     } catch (Exception e) {
       exchange.getOut().setHeader(Exchange.HTTP_RESPONSE_CODE, 404);

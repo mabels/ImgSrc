@@ -10,8 +10,8 @@ public class Server {
   public static void main(String[] args) {
     final CamelContext camelContext = new DefaultCamelContext();
     camelContext.disableJMX();
-    JettyHttpComponent jhc = new JettyHttpComponent();
-    HeaderFilterStrategy hfs = new MyFilterStrategy();
+    final JettyHttpComponent jhc = new JettyHttpComponent();
+    final HeaderFilterStrategy hfs = new MyFilterStrategy();
     jhc.setHeaderFilterStrategy(hfs);
     camelContext.addComponent("jetty", jhc);
     try {
