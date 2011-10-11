@@ -17,9 +17,13 @@ import org.apache.camel.Exchange;
 import org.apache.camel.Message;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.commons.io.IOUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 
+
 public class Router extends RouteBuilder {
+  private static final Logger LOGGER = LoggerFactory.getLogger(Router.class);
   public class ListenAddress {
     private String addr = "127.0.0.1";
     private String port = "1147";
@@ -63,8 +67,8 @@ public class Router extends RouteBuilder {
   }
 
   public void configure() {
-    System.out.println("Version:" + getServer());
-    System.out.println("Listen On:" + listenaddress.toString());
+    LOGGER.info("Version:" + getServer());
+    LOGGER.info("Listen On:" + listenaddress.toString());
     from("jetty:http://" + listenaddress.toString() + "?matchOnUriPrefix=true")
         .bean(this, "Imager");
   }
@@ -120,7 +124,7 @@ public class Router extends RouteBuilder {
         final InputStream is = Router.class.getClassLoader()
             .getResourceAsStream("test.html");
         testHtml = IOUtils.toString(is);
-        System.out.println("FETCH test.html");
+        LOGGER.debug("FETCH test.html");
       }
     }
     exchange.getOut().setHeader("Content-Type", "text/html");

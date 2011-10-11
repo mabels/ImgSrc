@@ -21,10 +21,10 @@ public class Steps<T> {
     return byName.get(name);
   }
 
-  private static final Pattern reSplit = Pattern.compile("/+");
+  private static final Pattern RESPLIT = Pattern.compile("/+");
   
   public static LinkedList<String> splitPath(String path) {
-    String[] paths = reSplit.split(path, 0);
+    String[] paths = RESPLIT.split(path, 0);
     LinkedList<String> datas = new LinkedList<String>();
     for (int i = 0; i < paths.length; ++i) {
       String data = paths[i];
