@@ -13,11 +13,13 @@ import java.util.regex.Pattern;
 
 import javax.management.RuntimeErrorException;
 
+
 import lombok.Data;
 import lombok.val;
 
 @Data
 public class Image {
+  //private static final Logger LOGGER = LoggerFactory.getLogger(Image.class);
   private boolean redirect = false;
   private int width = 100;
   private int height = 100;
@@ -25,9 +27,22 @@ public class Image {
   private Color textcolor = new Color(0xffffff);
   private String text = null;
   private String path = null;
+  private int wait = 0;
 
   private Format format = null;
 
+  public void setWait(Object o) {
+    //LOGGER.debug("setWait:"+o);
+    if (o == null) { return; }
+    try {
+      wait = Integer.parseInt((String)o);
+    } catch (Exception e) {
+      wait = (int)(Math.random()*1000);
+    }
+  }
+  public boolean shouldWait() {
+    return wait != 0;
+  }
   public boolean orRedirect(boolean val) {
     redirect |= val;
     return redirect;

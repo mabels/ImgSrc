@@ -9,7 +9,7 @@ public class MyFilterStrategy extends DefaultHeaderFilterStrategy {
   }
 
   protected void initialize() {
-    getOutFilter().add("content-length");
+    //getOutFilter().add("content-length");
     getOutFilter().add("content-type");
     getOutFilter().add(Exchange.HTTP_RESPONSE_CODE);
     setLowerCase(true);

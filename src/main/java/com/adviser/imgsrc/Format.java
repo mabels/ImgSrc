@@ -51,7 +51,7 @@ abstract class Format {
       }
     }
     if (ret == null) {
-      ret = factory().get(".gif");
+      ret = factory().get(".png");
     }
     img.setPath(path.trim());
     return ret;

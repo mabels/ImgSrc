@@ -131,6 +131,14 @@ public class Router extends RouteBuilder {
     exchange.getOut().setBody(testHtml);
   }
 
+  private void setNoCacheHeaders(Message out) {
+    out.setHeader("cache-control", constant("no-cache"));
+    out.setHeader("pragma", constant("no-cache"));
+  }
+  private void setCacheHeaders(Message out) {
+    out.setHeader("cache-control", constant("max-age=315360000"));
+    out.setHeader("expires", "Thu, 31 Dec 2037 23:55:55 GMT");
+  }
   public void Imager(Exchange exchange) {
     final Message in = exchange.getIn();
     try {
@@ -143,22 +151,27 @@ public class Router extends RouteBuilder {
         return;
       }
       Image image = Image.fromPath(path);
+      image.setWait(in.getHeaders().get("wait"));
       if (path.startsWith("/favicon.ico")) {
         image = Image.fromPath("/16/16/a00/000/favicon.ico");
       }
       if (image.isRedirect()) {
         final String location = image.getFullPath();
         out.setHeader("location", location);
-        out.setHeader("cache-control", constant("no-cache"));
-        out.setHeader("pragma", constant("no-cache"));
+        setNoCacheHeaders(out);
         out.setHeader(Exchange.HTTP_RESPONSE_CODE, 302);
         out.setBody("redirect to:" + location + "\n");
       } else {
-        out.setHeader("Content-Type", image.getFormat().getMime());
-        out.setHeader("cache-control", constant("max-age=315360000"));
-        out.setHeader("expires", "Thu, 31 Dec 2037 23:55:55 GMT");
+        out.setHeader("content-type", image.getFormat().getMime());
+        if (image.shouldWait()) {  
+          LOGGER.debug("Wait:"+image.getWait());
+          Thread.sleep(image.getWait());
+          setNoCacheHeaders(out); 
+        } else {  
+          setCacheHeaders(out);
+        }
         byte[] img = cachedProcessing(image).toByteArray();
-        // _out.setHeader("Length", img.length);
+        out.setHeader("content-length", img.length);
         out.setBody(img);
       }
     } catch (Exception e) {
