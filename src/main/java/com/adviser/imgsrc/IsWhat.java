@@ -116,7 +116,7 @@ public class IsWhat {
   public IsWhat(String data) {
     try {
       Integer dim = new Integer(Integer.parseInt(data));
-      if (0 < dim.intValue() && dim.intValue() < 2000) {
+      if (0 < dim.intValue() && dim.intValue() < 4096) {
         setDim(dim);
       }
     } catch (Exception e) {

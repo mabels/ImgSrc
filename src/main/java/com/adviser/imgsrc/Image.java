@@ -191,8 +191,8 @@ public class Image {
   }
 
   public BufferedImage drawImage() {
-    if (width > 2048 || height > 2048) {
-      throw new RuntimeErrorException(new Error("Image too big max 2048x2048:"
+    if (width > 4096 || height > 4096) {
+      throw new RuntimeErrorException(new Error("Image too big max 4096x4096:"
           + width + "x" + height));
     }
     final BufferedImage image = new BufferedImage(width, height,
