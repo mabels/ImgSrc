@@ -11,7 +11,7 @@ Than you just start the webserver with:
 
 you could access the images with this url schema
 
-/height/width/backcolor/textcolor/text.format
+/heightxwidth/backcolor/textcolor/text.format
 
 _ height is a number in pixel max 2048
 _ width is a number in pixel max 2048

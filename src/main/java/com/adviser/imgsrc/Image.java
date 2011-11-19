@@ -53,7 +53,7 @@ public class Image {
     final StringBuffer sb = new StringBuffer();
     sb.append("/");
     sb.append(Integer.toString(this.getWidth()));
-    sb.append("/");
+    sb.append("x");
     sb.append(Integer.toString(this.getHeight()));
     sb.append("/");
     sb.append(Integer.toHexString(this.getBackcolor().getRGB()));
@@ -79,32 +79,32 @@ public class Image {
 
   private static Steps<Image> _steps = null;
   
+  private static final Pattern RENUMBER = Pattern.compile("\\p{Digit}{1,4}");
+  private static final Pattern REWIDTHHEIGHT = Pattern
+      .compile("(\\p{Digit}{1,4})[xX](\\p{Digit}{1,4})");
 
   private static Steps<Image> getSteps() {
     if (_steps != null) { return _steps; }
     _steps = new Steps<Image>();
     
     _steps.add(new Step<Image>("Width") {
+ 
       public Step<Image> parse(Image img, String data) {
-        IsWhat iw = new IsWhat(data);
-        if (iw.getDim() != null) {
-          img.setWidth(iw.getDim().intValue());
-          img.setHeight(img.getWidth());
-          return _steps.getStepByName("Height");
+        if (RENUMBER.matcher(data).matches()) {
+          Integer dim = Integer.valueOf(Integer.parseInt(data));
+          if (0 < dim.intValue() && dim.intValue() < 4096) {
+            img.setWidth(dim);
+            img.setHeight(dim);
+            return _steps.getStepByName("BackColor");
+          }
         }
-        if (iw.assignBackColor(img)) {
-          return _steps.getStepByName("TextColor");
-        }
-        return iw.assignText(img);
-      }       
-    });
-    _steps.add(new Step<Image>("Height") {
-      public Step<Image> parse(Image img, String data) {
-        IsWhat iw = new IsWhat(data);
-        if (iw.getDim() != null) {
-          img.setHeight(iw.getDim().intValue());
+        final Matcher widthheight = REWIDTHHEIGHT.matcher(data);
+        if (widthheight.matches()) {
+          img.setWidth(Integer.valueOf(Integer.parseInt(widthheight.group(1))));
+          img.setHeight(Integer.valueOf(Integer.parseInt(widthheight.group(2))));
           return _steps.getStepByName("BackColor");
         }
+        IsWhat iw = new IsWhat(data);
         if (iw.assignBackColor(img)) {
           return _steps.getStepByName("TextColor");
         }
