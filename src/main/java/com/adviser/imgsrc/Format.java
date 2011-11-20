@@ -9,9 +9,9 @@ import java.util.regex.Pattern;
 
 //@Data
 abstract class Format {
-  abstract public String getFormat();
-  abstract public String getMime();
-  abstract public String getSuffix();
+  public abstract String getFormat();
+  public abstract String getMime();
+  public abstract String getSuffix();
 
   //private String cleanPath;
 

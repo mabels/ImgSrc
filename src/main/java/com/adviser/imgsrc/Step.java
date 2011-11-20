@@ -4,8 +4,8 @@ import lombok.Data;
 
 @Data
 public abstract class Step<T> {
-  public Step(String name) {
-    this.name = name;
+  public Step(String inName) {
+    this.name = inName;
   }
   private Steps<T> steps = null;
   private String name = null;

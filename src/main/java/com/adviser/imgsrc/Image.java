@@ -20,9 +20,12 @@ import lombok.val;
 @Data
 public class Image {
   //private static final Logger LOGGER = LoggerFactory.getLogger(Image.class);
+  
+  private static final int MAXDIM = 4096;
   private boolean redirect = false;
-  private int width = 100;
-  private int height = 100;
+  private static final int DEFAULTDIM = 100;
+  private int width = DEFAULTDIM;
+  private int height = DEFAULTDIM;
   private Color backcolor = new Color(0x444444);
   private Color textcolor = new Color(0xffffff);
   private String text = null;
@@ -92,7 +95,7 @@ public class Image {
       public Step<Image> parse(Image img, String data) {
         if (RENUMBER.matcher(data).matches()) {
           Integer dim = Integer.valueOf(Integer.parseInt(data));
-          if (0 < dim.intValue() && dim.intValue() < 4096) {
+          if (0 < dim.intValue() && dim.intValue() < MAXDIM) {
             img.setWidth(dim);
             img.setHeight(dim);
             return _steps.getStepByName("BackColor");
@@ -190,8 +193,9 @@ public class Image {
     return getFormat().getStream(drawImage());
   }
 
+  private static final int BORDER = 5;
   public BufferedImage drawImage() {
-    if (width > 4096 || height > 4096) {
+    if (width > MAXDIM || height > MAXDIM) {
       throw new RuntimeErrorException(new Error("Image too big max 4096x4096:"
           + width + "x" + height));
     }
@@ -202,7 +206,7 @@ public class Image {
       graph.setPaint(textcolor);
       graph.fillRect(0, 0, width, height);
       graph.setPaint(backcolor);
-      graph.fillRect(5, 5, width - 10, height - 10);
+      graph.fillRect(BORDER, BORDER, width - 2*BORDER, height - 2*BORDER);
       graph.setPaint(textcolor);
       graph.drawLine(0, 0, width, height);
       graph.drawLine(width, 0, 0, height);

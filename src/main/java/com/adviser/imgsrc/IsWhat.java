@@ -125,8 +125,8 @@ public class IsWhat {
 
 
   public IsWhat(String data) {
-    color = asColor(data);
-    if (color == null) {
+    this.color = asColor(data);
+    if (this.color == null) {
       setText(data);
     }
 
