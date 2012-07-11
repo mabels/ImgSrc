@@ -199,11 +199,8 @@ public class Image {
       throw new RuntimeErrorException(new Error("Image too big max 4096x4096:"
           + width + "x" + height));
     }
-    System.out.println("**********:"+this.getBackcolor().getColorSpace().getType());
-    System.out.println("**********:"+BufferedImage.TYPE_INT_ARGB);
-    System.out.println("**********:"+BufferedImage.TYPE_INT_RGB);
     final BufferedImage image = new BufferedImage(width, height,
-        /*this.getBackcolor().getColorSpace().getType() */ BufferedImage.TYPE_INT_ARGB);
+                                                  BufferedImage.TYPE_INT_ARGB);
     final Graphics2D graph = image.createGraphics();
     if (this.isFrame()) {
       graph.setPaint(textcolor);
