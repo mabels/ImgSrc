@@ -51,7 +51,12 @@ public class IsWhat {
   private Color asRGBColor(String s) {
     int rgb = 0xCCCCC;
     final long val = Long.parseLong(s.toUpperCase(), 16);
-    if (s.length() == 3) {
+    if (s.length() == 1) {
+      int r = (int) (val & FOURBITS);
+      int g = (int) (val & FOURBITS);
+      int b = (int) (val & FOURBITS);
+      rgb = (r | r << 4) << 16 | (g | g << 4) << 8 | (b | b << 4) << 0;      
+    } else if (s.length() == 3) {
       int r = (int) ((val >> RBIT) & FOURBITS);
       int g = (int) ((val >> GBIT) & FOURBITS);
       int b = (int) ((val >> BBIT) & FOURBITS);
@@ -62,11 +67,25 @@ public class IsWhat {
     return new Color(rgb);
   }
 
+  private Color asRGBAColor(String s) {
+    String[] parts = s.split(",");
+    int precend = (int)((Integer.parseInt(parts[1], 10)/100f) * 255f);
+    final Color temp = asRGBColor(parts[0]);
+    return new Color(temp.getRed(), temp.getGreen(), temp.getBlue(), precend);
+  }
+  
   private Color asABGRColor(String s) {
     // format.setColorSpace(BufferedImage.TYPE_4BYTE_ABGR);
     int rgb = 0xFFCCCCC;
-    final long val = Long.parseLong(s.toUpperCase(), 16);
-    if (s.length() == 4) {
+    long val = Long.parseLong(s.toUpperCase(), 16);
+    if (s.length() == 2 || s.length() == 4) {
+      if (s.length() == 2) {
+        // Blow up the rgb value;
+        val = (((val >> 4) & FOURBITS) << ALPHABIT) |
+              (((val >> 0) & FOURBITS) << RBIT) |
+              (((val >> 0) & FOURBITS) << GBIT) |
+              (((val >> 0) & FOURBITS) << BBIT);               
+      }
       int a = (int) ((val >> ALPHABIT) & FOURBITS);
       int r = (int) ((val >> RBIT) & FOURBITS);
       int g = (int) ((val >> GBIT) & FOURBITS);
@@ -77,9 +96,7 @@ public class IsWhat {
       // + Integer.toHexString(rgb));
       return new Color(rgb, true);
     } else if (s.length() == 8) {
-      rgb = (int) val; // (int) (((val >> 0) & 0xff) << 0 | ((val >> 8) & 0xff)
-                       // << 8
-      // | ((val >> 16) & 0xff) << 16 | ((val >> 24) & 0xff) << 24);
+      rgb = (int) val;
       return new Color(rgb, true);
     }
     return new Color(rgb);
@@ -87,10 +104,15 @@ public class IsWhat {
 
   private static final Random RAND = new Random(System.currentTimeMillis());
 
+  private static final Pattern RE1ER = Pattern.compile("\\p{XDigit}{1}");
+  private static final Pattern RE2ER = Pattern.compile("\\p{XDigit}{2}");
   private static final Pattern RE4ER = Pattern.compile("\\p{XDigit}{4}");
   private static final Pattern RE8ER = Pattern.compile("\\p{XDigit}{8}");
   private static final Pattern RE3ER = Pattern.compile("\\p{XDigit}{3}");
   private static final Pattern RE6ER = Pattern.compile("\\p{XDigit}{6}");
+  private static final Pattern RE1RGBA = Pattern.compile("^\\p{XDigit}{1},\\p{Digit}{1,2}$");
+  private static final Pattern RE3RGBA = Pattern.compile("^\\p{XDigit}{3},\\p{Digit}{1,2}$");
+  private static final Pattern RE6RGBA = Pattern.compile("^\\p{XDigit}{6},\\p{Digit}{1,2}$");
 
   private Color asColor(String s) {
     final char first = s.charAt(0);
@@ -103,12 +125,18 @@ public class IsWhat {
       random = true;
     }
     Color ret = null;
-    if ((len == 4 && RE4ER.matcher(s).matches())
-        || (len == 8 && RE8ER.matcher(s).matches())) {
+    if ((len == 2 && RE2ER.matcher(s).matches()) ||
+        (len == 4 && RE4ER.matcher(s).matches()) ||
+        (len == 8 && RE8ER.matcher(s).matches())) {
       ret = asABGRColor(s);
     } else if ((len == 3 && RE3ER.matcher(s).matches())
-        || (len == 6 && RE6ER.matcher(s).matches())) {
+        || (len == 6 && RE6ER.matcher(s).matches()) 
+        || (len == 1 && RE1ER.matcher(s).matches())) {
       ret = asRGBColor(s);
+    } else if (RE1RGBA.matcher(s).matches() ||
+          RE3RGBA.matcher(s).matches() || 
+          RE6RGBA.matcher(s).matches()) {
+      ret = asRGBAColor(s);
     }
     if (random && ret != null) {
       int r = RAND.nextInt() & FOURBITS;
