@@ -7,20 +7,21 @@ import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.management.RuntimeErrorException;
-
 
 import lombok.Data;
 import lombok.val;
 
 @Data
 public class Image {
-  //private static final Logger LOGGER = LoggerFactory.getLogger(Image.class);
-  
+  // private static final Logger LOGGER = LoggerFactory.getLogger(Image.class);
+
   private static final int MAXDIM = 4096;
   private boolean redirect = false;
   private static final int DEFAULTDIM = 100;
@@ -35,22 +36,25 @@ public class Image {
   private Format format = null;
 
   public void setWait(Object o) {
-    //LOGGER.debug("setWait:"+o);
-    if (o == null) { return; }
+    // LOGGER.debug("setWait:"+o);
+    if (o == null) {
+      return;
+    }
     try {
-      wait = Integer.parseInt((String)o);
+      wait = Integer.parseInt((String) o);
     } catch (Exception e) {
-      wait = (int)(Math.random()*1000);
+      wait = (int) (Math.random() * 1000);
     }
   }
+
   public boolean shouldWait() {
     return wait != 0;
   }
+
   public boolean orRedirect(boolean val) {
     redirect |= val;
     return redirect;
   }
-
 
   public String getFullPath() {
     final StringBuffer sb = new StringBuffer();
@@ -69,7 +73,7 @@ public class Image {
   }
 
   private boolean frame = false;
-  private static Pattern _frame = Pattern.compile("(.*)\\.[xX](.*)");
+  private static Pattern _frame = Pattern.compile("(.*)\\.[×xX](.*)");
 
   private String hasFrame(String path) {
     Matcher match = _frame.matcher(path);
@@ -81,18 +85,85 @@ public class Image {
   }
 
   private static Steps<Image> _steps = null;
-  
+
   private static final Pattern RENUMBER = Pattern.compile("\\p{Digit}{1,4}");
   private static final Pattern REWIDTHHEIGHT = Pattern
-      .compile("(\\p{Digit}{1,4})[xX](\\p{Digit}{1,4})");
+      .compile("(\\p{Digit}{1,4})[×xX](\\p{Digit}{1,4})");
+  private static final Pattern REASPECTHEIGHT = Pattern
+      .compile("(\\p{Digit}{1,4}):(\\p{Digit}{1,4})[×xX](\\p{Digit}{1,4})");
+  private static final Pattern REWIDTHASPECT = Pattern
+      .compile("(\\p{Digit}{1,4})[×xX](\\p{Digit}{1,4}):(\\p{Digit}{1,4})");
+
+  @Data
+  private static class AspectRatio {
+    private final String fullName;
+    private final String shortName;
+    private final Pattern regEx;
+    private final String ratio;
+
+    public AspectRatio(String fullName, String shortName, String ratio,
+        String regEx) {
+      this.fullName = fullName;
+      this.shortName = shortName;
+      this.regEx = Pattern.compile(regEx);
+      this.ratio = ratio;
+    }
+  }
+
+  private static List<AspectRatio> standardAspectRatios() {
+    final List<AspectRatio> ret = new ArrayList<AspectRatio>();
+    ret.add(new AspectRatio("mediumrectangle", "medrect", "300×250",
+        "^(med)\\w+(rec\\w+)$"));
+
+    ret.add(new AspectRatio("squarepopup", "sqrpop", "250×250", "^(s\\w+pop)$"));
+    ret.add(new AspectRatio("verticalrectangle", "vertrec", "240×400",
+        "^(ver)\\w+(rec)$"));
+    ret.add(new AspectRatio("largerectangle", "lrgrec", "336×280",
+        "^(large|lrg)(rec)$"));
+    ret.add(new AspectRatio("rectangle", "rec", "180×150", "^(rec)$"));
+    ret.add(new AspectRatio("popunder", "pop", "720×300", "^(pop)$"));
+    ret.add(new AspectRatio("fullbanner", "fullban", "468×60", "^(f\\w+ban)$"));
+    ret.add(new AspectRatio("halfbanner", "halfban", "234×60", "^(h\\w+ban)$"));
+    ret.add(new AspectRatio("microbar", "mibar", "88×31", "^(m\\w+bar)$"));
+    ret.add(new AspectRatio("button1", "but1", "120×90", "^(b\\w+1)$"));
+    ret.add(new AspectRatio("button2", "but2", "120×60", "^(b\\w+2)$"));
+    ret.add(new AspectRatio("verticalbanner", "vertban", "120×240",
+        "^(ver\\w+ban)$"));
+    ret.add(new AspectRatio("squarebutton", "sqrbut", "125×125", "^(s\\w+but)$"));
+    ret.add(new AspectRatio("leaderboard", "leadbrd", "728×90", "^(lea\\w+rd)$"));
+    ret.add(new AspectRatio("wideskyscraper", "wiskyscrpr", "160×600",
+        "^(w\\w+sk\\w+r)$"));
+    ret.add(new AspectRatio("skyscraper", "skyscrpr", "120×600", "^(sk\\w+r)$"));
+    ret.add(new AspectRatio("halfpage", "hpge", "300×600", "^(h\\w+g)$"));
+    return ret;
+  }
+
+  private final static List<AspectRatio> aspectRatios = standardAspectRatios();
+
+  private final static float getAspectRatio(String zaehler, String nenner) {
+    try {
+      return (Integer.parseInt(zaehler) * 1.0f) / Integer.parseInt(nenner);
+    } catch (Exception e) {
+      return 1;
+    }
+  }
 
   private static Steps<Image> getSteps() {
-    if (_steps != null) { return _steps; }
+    if (_steps != null) {
+      return _steps;
+    }
     _steps = new Steps<Image>();
-    
+
     _steps.add(new Step<Image>("Width") {
- 
+
       public Step<Image> parse(Image img, String data) {
+        for (final AspectRatio ar : aspectRatios) {
+          if (ar.getFullName().equalsIgnoreCase(data)) {
+            img.setText(data);
+            data = ar.getRatio();
+            break;
+          }
+        }
         if (RENUMBER.matcher(data).matches()) {
           Integer dim = Integer.valueOf(Integer.parseInt(data));
           if (0 < dim.intValue() && dim.intValue() < MAXDIM) {
@@ -101,43 +172,59 @@ public class Image {
             return _steps.getStepByName("BackColor");
           }
         }
+        final Matcher aspectheight = REASPECTHEIGHT.matcher(data);
+        if (aspectheight.matches()) {
+          final int width = (int) (Integer.parseInt(aspectheight.group(3)) * getAspectRatio(
+              aspectheight.group(1), aspectheight.group(2)));
+          img.setText(data);
+          data = Integer.toString(width) + "x" + aspectheight.group(3);
+        } else {
+          final Matcher widthaspect = REWIDTHASPECT.matcher(data);
+          if (widthaspect.matches()) {
+            final int height = (int) (Integer.parseInt(widthaspect.group(1)) * getAspectRatio(
+                widthaspect.group(2), widthaspect.group(3)));
+            img.setText(data);
+            data = widthaspect.group(1) + "x" + Integer.toString(height);
+          }
+        }
+
         final Matcher widthheight = REWIDTHHEIGHT.matcher(data);
         if (widthheight.matches()) {
           img.setWidth(Integer.valueOf(Integer.parseInt(widthheight.group(1))));
           img.setHeight(Integer.valueOf(Integer.parseInt(widthheight.group(2))));
           return _steps.getStepByName("BackColor");
         }
-        IsWhat iw = new IsWhat(data);
+        final IsWhat iw = new IsWhat(data);
         if (iw.assignBackColor(img)) {
           return _steps.getStepByName("TextColor");
         }
         return iw.assignText(img);
-      }       
+      }
     });
     _steps.add(new Step<Image>("BackColor") {
       public Step<Image> parse(Image img, String data) {
-        IsWhat iw = new IsWhat(data);
+        final IsWhat iw = new IsWhat(data);
         if (iw.assignBackColor(img)) {
           return _steps.getStepByName("TextColor");
         }
         return iw.assignText(img);
-      }       
+      }
     });
     _steps.add(new Step<Image>("TextColor") {
       public Step<Image> parse(Image img, String data) {
-        IsWhat iw = new IsWhat(data);
+        final IsWhat iw = new IsWhat(data);
         if (iw.getColor() != null) {
           img.setTextcolor(iw.getColor());
           return _steps.getStepByName("Text");
         }
         return iw.assignText(img);
-      }       
+      }
     });
     _steps.add(new Step<Image>("Text") {
       public Step<Image> parse(Image img, String data) {
-       img.setText(data);
-       return null;
-      }       
+        img.setText(data);
+        return null;
+      }
     });
     return _steps;
   }
@@ -194,19 +281,20 @@ public class Image {
   }
 
   private static final int BORDER = 5;
+
   public BufferedImage drawImage() {
     if (width > MAXDIM || height > MAXDIM) {
       throw new RuntimeErrorException(new Error("Image too big max 4096x4096:"
           + width + "x" + height));
     }
     final BufferedImage image = new BufferedImage(width, height,
-                                                  BufferedImage.TYPE_INT_ARGB);
+        BufferedImage.TYPE_INT_ARGB);
     final Graphics2D graph = image.createGraphics();
     if (this.isFrame()) {
       graph.setPaint(textcolor);
       graph.fillRect(0, 0, width, height);
       graph.setPaint(backcolor);
-      graph.fillRect(BORDER, BORDER, width - 2*BORDER, height - 2*BORDER);
+      graph.fillRect(BORDER, BORDER, width - 2 * BORDER, height - 2 * BORDER);
       graph.setPaint(textcolor);
       graph.drawLine(0, 0, width, height);
       graph.drawLine(width, 0, 0, height);
