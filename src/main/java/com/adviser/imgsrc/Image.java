@@ -301,7 +301,7 @@ public class Image {
       throw new RuntimeErrorException(new Error("Image too big max 4096x4096:"
           + width + "x" + height));
     }
-    System.err.println("XXXX:"+this.getColorSpace()+":"+this.getFormat().getMime());
+    //System.err.println("XXXX:"+this.getColorSpace()+":"+this.getFormat().getMime());
     final BufferedImage image = new BufferedImage(width, height,
         this.getColorSpace());
     final Graphics2D graph = image.createGraphics();
