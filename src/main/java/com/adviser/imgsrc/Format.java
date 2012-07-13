@@ -39,8 +39,8 @@ abstract class Format {
   }
   private static Pattern _suffix = Pattern.compile("(.*)(\\.\\w{3})(.*)");
 
-  public static Format fromPath(String path, Image img) {
-
+  public static Format fromPath(String paramPath, Image img) {
+    String path = paramPath;
     Format ret = null;
     Matcher suffix = _suffix.matcher(path);
     if (suffix.matches()) {

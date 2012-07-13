@@ -1,6 +1,5 @@
 package com.adviser.imgsrc;
 
-
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.FontMetrics;
@@ -71,10 +70,10 @@ public class Image {
   }
 
   private boolean frame = false;
-  private static Pattern _frame = Pattern.compile("(.*)\\.[xX](.*)");
+  private final static Pattern REFRAME = Pattern.compile("(.*)\\.[xX](.*)");
 
   private String hasFrame(String path) {
-    Matcher match = _frame.matcher(path);
+    Matcher match = REFRAME.matcher(path);
     if (match.matches()) {
       frame = true;
       return match.group(1) + match.group(2);
@@ -82,7 +81,7 @@ public class Image {
     return path;
   }
 
-  private static Steps<Image> _steps = null;
+  private static Steps<Image> steps = null;
 
   private static final Pattern RENUMBER = Pattern.compile("\\p{Digit}{1,4}");
   private static final Pattern REWIDTHHEIGHT = Pattern
@@ -153,9 +152,9 @@ public class Image {
     return ret;
   }
 
-  private final static List<AspectRatio> aspectRatios = standardAspectRatios();
+  private final static List<AspectRatio> ASPECTRATIOS = standardAspectRatios();
 
-  private final static float getAspectRatio(String zaehler, String nenner) {
+  private static float getAspectRatio(String zaehler, String nenner) {
     try {
       return (Integer.parseInt(zaehler) * 1.0f) / Integer.parseInt(nenner);
     } catch (Exception e) {
@@ -163,42 +162,46 @@ public class Image {
     }
   }
 
-  protected static Steps<Image> getSteps() {
-    if (_steps != null) {
-      return _steps;
+  private final static String translateStandardRatios(String data, Image img) {
+    for (final AspectRatio ar : ASPECTRATIOS) {
+      if (ar.getFullName().equalsIgnoreCase(data)
+          || ar.getShortName().equalsIgnoreCase(data)) {
+        img.setText(data);
+        return ar.getRatio();
+      }
     }
-    _steps = new Steps<Image>();
+    return data;
+  }
 
-    _steps.add(new Step<Image>("Dimension") {
+  protected static Steps<Image> getSteps() {
+    if (steps != null) {
+      return steps;
+    }
+    steps = new Steps<Image>();
 
-      public Step<Image> parse(Image img, String data) {
-        for (final AspectRatio ar : aspectRatios) {
-          if (ar.getFullName().equalsIgnoreCase(data) ||
-              ar.getShortName().equalsIgnoreCase(data)) {
-            img.setText(data);
-            data = ar.getRatio();
-            break;
-          }
-        }
+    steps.add(new Step<Image>("Dimension") {
+
+      public Step<Image> parse(Image img, String paramData) {
+        String data = translateStandardRatios(paramData, img);
         if (RENUMBER.matcher(data).matches()) {
           Integer dim = Integer.valueOf(Integer.parseInt(data));
           if (0 < dim.intValue() && dim.intValue() < MAXDIM) {
             img.setWidth(dim);
             img.setHeight(dim);
-            return _steps.getStepByName("BackColor");
+            return steps.getStepByName("BackColor");
           }
         }
         final Matcher aspectheight = REASPECTHEIGHT.matcher(data);
         if (aspectheight.matches()) {
-          final int width = (int) (Integer.parseInt(aspectheight.group(3)) * getAspectRatio(
+          final int tmpWidth = (int) (Integer.parseInt(aspectheight.group(3)) * getAspectRatio(
               aspectheight.group(1), aspectheight.group(2)));
-          data = Integer.toString(width) + "x" + aspectheight.group(3);
+          data = Integer.toString(tmpWidth) + "x" + aspectheight.group(3);
         } else {
           final Matcher widthaspect = REWIDTHASPECT.matcher(data);
           if (widthaspect.matches()) {
-            final int height = (int) (Integer.parseInt(widthaspect.group(1)) * getAspectRatio(
+            final int tmpHeight = (int) (Integer.parseInt(widthaspect.group(1)) * getAspectRatio(
                 widthaspect.group(3), widthaspect.group(2)));
-            data = widthaspect.group(1) + "x" + Integer.toString(height);
+            data = widthaspect.group(1) + "x" + Integer.toString(tmpHeight);
           }
         }
 
@@ -206,44 +209,45 @@ public class Image {
         if (widthheight.matches()) {
           img.setWidth(Integer.valueOf(Integer.parseInt(widthheight.group(1))));
           img.setHeight(Integer.valueOf(Integer.parseInt(widthheight.group(2))));
-          return _steps.getStepByName("BackColor");
+          return steps.getStepByName("BackColor");
         }
         final IsWhat iw = new IsWhat(data);
         if (iw.assignBackColor(img)) {
-          return _steps.getStepByName("TextColor");
+          return steps.getStepByName("TextColor");
         }
         return iw.assignText(img);
       }
     });
-    _steps.add(new Step<Image>("BackColor") {
+    steps.add(new Step<Image>("BackColor") {
       public Step<Image> parse(Image img, String data) {
         final IsWhat iw = new IsWhat(data);
         if (iw.assignBackColor(img)) {
-          return _steps.getStepByName("TextColor");
+          return steps.getStepByName("TextColor");
         }
         return iw.assignText(img);
       }
     });
-    _steps.add(new Step<Image>("TextColor") {
+    steps.add(new Step<Image>("TextColor") {
       public Step<Image> parse(Image img, String data) {
         final IsWhat iw = new IsWhat(data);
         if (iw.getColor() != null) {
           img.setTextcolor(iw.getColor());
-          return _steps.getStepByName("Text");
+          return steps.getStepByName("Text");
         }
         return iw.assignText(img);
       }
     });
-    _steps.add(new Step<Image>("Text") {
+    steps.add(new Step<Image>("Text") {
       public Step<Image> parse(Image img, String data) {
         img.setText(data);
         return null;
       }
     });
-    return _steps;
+    return steps;
   }
 
-  public static Image fromPath(String path) {
+  public static Image fromPath(String paramPath) {
+    String path = paramPath;
     final Image img = new Image();
     /*
      * /height/width/backcolor/textcolor/text<.format>
@@ -257,11 +261,11 @@ public class Image {
     return img;
   }
 
-  private static Pattern _space = Pattern.compile("^[\\._\\-\\*\\+ ]$");
+  private final static Pattern RESPACE = Pattern.compile("^[\\._\\-\\*\\+ ]$");
 
   public String getText() {
     if (text != null) {
-      if (_space.matcher(text).matches()) {
+      if (RESPACE.matcher(text).matches()) {
         return "";
       }
       return text;
@@ -301,7 +305,7 @@ public class Image {
       throw new RuntimeErrorException(new Error("Image too big max 4096x4096:"
           + width + "x" + height));
     }
-    //System.err.println("XXXX:"+this.getColorSpace()+":"+this.getFormat().getMime());
+    // System.err.println("XXXX:"+this.getColorSpace()+":"+this.getFormat().getMime());
     final BufferedImage image = new BufferedImage(width, height,
         this.getColorSpace());
     final Graphics2D graph = image.createGraphics();

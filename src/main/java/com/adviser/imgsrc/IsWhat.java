@@ -16,9 +16,14 @@ public class IsWhat {
   private static final int ALPHAMASK = 0xff000000;
   private static final int RGBMASK = 0xffffff;
   private static final int ALPHABIT = 12;
+  private static final int UP4BIT = 4;
   private static final int RBIT = 8;
   private static final int GBIT = 4;
   private static final int BBIT = 0;
+  private static final int AABIT = 24; // AlphaBits
+  private static final int RRBIT = 16;
+  private static final int GGBIT = 8;
+  private static final int BBBIT = 0;
   
   private Integer colorSpace = null;
 
@@ -58,12 +63,12 @@ public class IsWhat {
       int r = (int) (val & FOURBITS);
       int g = (int) (val & FOURBITS);
       int b = (int) (val & FOURBITS);
-      rgb = (r | r << 4) << 16 | (g | g << 4) << 8 | (b | b << 4) << 0;
+      rgb = (r | r << UP4BIT) << RRBIT | (g | g << UP4BIT) << GGBIT | (b | b << UP4BIT) << BBBIT;
     } else if (s.length() == 3) {
       int r = (int) ((val >> RBIT) & FOURBITS);
       int g = (int) ((val >> GBIT) & FOURBITS);
       int b = (int) ((val >> BBIT) & FOURBITS);
-      rgb = (r | r << 4) << 16 | (g | g << 4) << 8 | (b | b << 4) << 0;
+      rgb = (r | r << UP4BIT) << RRBIT | (g | g << UP4BIT) << GGBIT | (b | b << UP4BIT) << BBBIT;
     } else if (s.length() == 6) {
       rgb = (int) val;
     }
@@ -94,8 +99,8 @@ public class IsWhat {
       int r = (int) ((val >> RBIT) & FOURBITS);
       int g = (int) ((val >> GBIT) & FOURBITS);
       int b = (int) ((val >> BBIT) & FOURBITS);
-      rgb = (a | a << 4) << 24 | (r | r << 4) << 16 | (g | g << 4) << 8
-          | (b | b << 4) << 0;
+      rgb = (a | a << UP4BIT) << AABIT | (r | r << UP4BIT) << RRBIT | (g | g << UP4BIT) << GGBIT
+          | (b | b << UP4BIT) << BBBIT;
       // System.out.println("RGBA:" + Integer.toHexString(val) + ":"
       // + Integer.toHexString(rgb));
       return new Color(rgb, true);
@@ -121,7 +126,8 @@ public class IsWhat {
   private static final Pattern RE6RGBA = Pattern
       .compile("^\\p{XDigit}{6},\\p{Digit}{1,2}$");
 
-  private Color asColor(String s) {
+  private final Color asColor(String param) {
+    String s = param; //sonar
     final char first = s.charAt(0);
     int len = s.length();
     boolean random = false;
@@ -193,7 +199,7 @@ public class IsWhat {
     return text;
   }
 
-  public void setText(String text) {
+  public final void setText(String text) {
     this.text = text;
   }
 

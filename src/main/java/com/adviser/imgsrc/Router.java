@@ -88,14 +88,11 @@ public class Router extends RouteBuilder {
   private String version = null;
 
   private String getServer() {
-    if (version != null) {
-      return version;
-    }
     synchronized (this) {
-      if (version != null) {
-        return version;
+      if (this.version != null) {
+        return this.version;
       }
-      String version = "ImgSrv(development)";
+      String tmpVersion = "ImgSrv(development)";
       final InputStream is = Router.class.getClassLoader().getResourceAsStream(
           "META-INF/maven/com.adviser.imgsrc/imgsrc/pom.xml");
       if (is != null) {
@@ -104,16 +101,16 @@ public class Router extends RouteBuilder {
         try {
           DocumentBuilder db = dbf.newDocumentBuilder();
           doc = db.parse(is);
-          version = "ImgSrv("
+          tmpVersion = "ImgSrv("
               + doc.getElementsByTagName("version").item(0).getTextContent()
               + ")";
         } catch (Exception e) {
           // System.out.println("IS:"+e.getMessage());
         }
       }
-      this.version = version;
+      this.version = tmpVersion;
     }
-    return version;
+    return this.version;
   }
 
   private String testHtml = null;

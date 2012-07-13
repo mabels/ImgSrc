@@ -8,7 +8,7 @@ public class MyFilterStrategy extends DefaultHeaderFilterStrategy {
     initialize();
   }
 
-  protected void initialize() {
+  protected final void initialize() {
     //getOutFilter().add("content-length");
     getOutFilter().add("content-type");
     getOutFilter().add(Exchange.HTTP_RESPONSE_CODE);
