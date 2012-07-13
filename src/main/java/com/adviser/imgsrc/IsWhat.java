@@ -1,12 +1,10 @@
 package com.adviser.imgsrc;
 
 import java.awt.Color;
+import java.awt.image.BufferedImage;
 import java.util.Random;
 import java.util.regex.Pattern;
 
-import lombok.Data;
-
-@Data
 public class IsWhat {
   private Integer width = null;
   private Integer height = null;
@@ -21,9 +19,14 @@ public class IsWhat {
   private static final int RBIT = 8;
   private static final int GBIT = 4;
   private static final int BBIT = 0;
+  
+  private Integer colorSpace = null;
 
   public boolean assignBackColor(Image img) {
     if (getColor() != null) {
+      if (colorSpace != null) {
+        img.setColorSpace(colorSpace);
+      }
       img.setBackcolor(getColor());
       img.setTextcolor(asInvertColor(getColor()));
       img.orRedirect(this.isRedirect());
@@ -55,7 +58,7 @@ public class IsWhat {
       int r = (int) (val & FOURBITS);
       int g = (int) (val & FOURBITS);
       int b = (int) (val & FOURBITS);
-      rgb = (r | r << 4) << 16 | (g | g << 4) << 8 | (b | b << 4) << 0;      
+      rgb = (r | r << 4) << 16 | (g | g << 4) << 8 | (b | b << 4) << 0;
     } else if (s.length() == 3) {
       int r = (int) ((val >> RBIT) & FOURBITS);
       int g = (int) ((val >> GBIT) & FOURBITS);
@@ -69,22 +72,23 @@ public class IsWhat {
 
   private Color asRGBAColor(String s) {
     String[] parts = s.split(",");
-    int precend = (int)((Integer.parseInt(parts[1], 10)/100f) * 255f);
+    int precend = (int) ((Integer.parseInt(parts[1], 10) / 100f) * 255f);
     final Color temp = asRGBColor(parts[0]);
     return new Color(temp.getRed(), temp.getGreen(), temp.getBlue(), precend);
   }
-  
+
   private Color asABGRColor(String s) {
-    // format.setColorSpace(BufferedImage.TYPE_4BYTE_ABGR);
+    colorSpace = BufferedImage.TYPE_4BYTE_ABGR;
+    //System.err.println("asABGRColor:");
     int rgb = 0xFFCCCCC;
     long val = Long.parseLong(s.toUpperCase(), 16);
     if (s.length() == 2 || s.length() == 4) {
       if (s.length() == 2) {
         // Blow up the rgb value;
-        val = (((val >> 4) & FOURBITS) << ALPHABIT) |
-              (((val >> 0) & FOURBITS) << RBIT) |
-              (((val >> 0) & FOURBITS) << GBIT) |
-              (((val >> 0) & FOURBITS) << BBIT);               
+        val = (((val >> 4) & FOURBITS) << ALPHABIT)
+            | (((val >> 0) & FOURBITS) << RBIT)
+            | (((val >> 0) & FOURBITS) << GBIT)
+            | (((val >> 0) & FOURBITS) << BBIT);
       }
       int a = (int) ((val >> ALPHABIT) & FOURBITS);
       int r = (int) ((val >> RBIT) & FOURBITS);
@@ -110,9 +114,12 @@ public class IsWhat {
   private static final Pattern RE8ER = Pattern.compile("\\p{XDigit}{8}");
   private static final Pattern RE3ER = Pattern.compile("\\p{XDigit}{3}");
   private static final Pattern RE6ER = Pattern.compile("\\p{XDigit}{6}");
-  private static final Pattern RE1RGBA = Pattern.compile("^\\p{XDigit}{1},\\p{Digit}{1,2}$");
-  private static final Pattern RE3RGBA = Pattern.compile("^\\p{XDigit}{3},\\p{Digit}{1,2}$");
-  private static final Pattern RE6RGBA = Pattern.compile("^\\p{XDigit}{6},\\p{Digit}{1,2}$");
+  private static final Pattern RE1RGBA = Pattern
+      .compile("^\\p{XDigit}{1},\\p{Digit}{1,2}$");
+  private static final Pattern RE3RGBA = Pattern
+      .compile("^\\p{XDigit}{3},\\p{Digit}{1,2}$");
+  private static final Pattern RE6RGBA = Pattern
+      .compile("^\\p{XDigit}{6},\\p{Digit}{1,2}$");
 
   private Color asColor(String s) {
     final char first = s.charAt(0);
@@ -125,17 +132,16 @@ public class IsWhat {
       random = true;
     }
     Color ret = null;
-    if ((len == 2 && RE2ER.matcher(s).matches()) ||
-        (len == 4 && RE4ER.matcher(s).matches()) ||
-        (len == 8 && RE8ER.matcher(s).matches())) {
+    if ((len == 2 && RE2ER.matcher(s).matches())
+        || (len == 4 && RE4ER.matcher(s).matches())
+        || (len == 8 && RE8ER.matcher(s).matches())) {
       ret = asABGRColor(s);
     } else if ((len == 3 && RE3ER.matcher(s).matches())
-        || (len == 6 && RE6ER.matcher(s).matches()) 
+        || (len == 6 && RE6ER.matcher(s).matches())
         || (len == 1 && RE1ER.matcher(s).matches())) {
       ret = asRGBColor(s);
-    } else if (RE1RGBA.matcher(s).matches() ||
-          RE3RGBA.matcher(s).matches() || 
-          RE6RGBA.matcher(s).matches()) {
+    } else if (RE1RGBA.matcher(s).matches() || RE3RGBA.matcher(s).matches()
+        || RE6RGBA.matcher(s).matches()) {
       ret = asRGBAColor(s);
     }
     if (random && ret != null) {
@@ -151,13 +157,52 @@ public class IsWhat {
     return ret;
   }
 
-
   public IsWhat(String data) {
     this.color = asColor(data);
     if (this.color == null) {
       setText(data);
     }
 
+  }
+
+  public Integer getWidth() {
+    return width;
+  }
+
+  public void setWidth(Integer width) {
+    this.width = width;
+  }
+
+  public Integer getHeight() {
+    return height;
+  }
+
+  public void setHeight(Integer height) {
+    this.height = height;
+  }
+
+  public Color getColor() {
+    return color;
+  }
+
+  public void setColor(Color color) {
+    this.color = color;
+  }
+
+  public String getText() {
+    return text;
+  }
+
+  public void setText(String text) {
+    this.text = text;
+  }
+
+  public boolean isRedirect() {
+    return redirect;
+  }
+
+  public void setRedirect(boolean redirect) {
+    this.redirect = redirect;
   }
 
 }

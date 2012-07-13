@@ -1,28 +1,39 @@
 package com.adviser.imgsrc;
 
 import java.awt.image.BufferedImage;
-
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
 import net.sf.image4j.codec.ico.ICOEncoder;
 //@Suffix(".png")
-@Data
-@EqualsAndHashCode(callSuper=false)
-
 class Format_ico extends Format {
-  private String format = "ICO";
-  private String mime = "image/x-icon";
-  private int colorSpace = BufferedImage.TYPE_INT_RGB;
-  private String suffix = ".ico";
+  private final String format = "ICO";
+  private final String mime = "image/x-icon";
+  private final int colorSpace = BufferedImage.TYPE_INT_RGB;
+  private final String suffix = ".ico";
 
   public ByteArrayOutputStream getStream(BufferedImage img) throws IOException {
     ByteArrayOutputStream ret = new ByteArrayOutputStream();
     ICOEncoder.write(img, ret);
     return ret;
   }
- 
+
+  public String getFormat() {
+    return format;
+  }
+
+  public String getMime() {
+    return mime;
+  }
+
+  public int getColorSpace() {
+    return colorSpace;
+  }
+
+  public String getSuffix() {
+    return suffix;
+  }
+
+
   
 }

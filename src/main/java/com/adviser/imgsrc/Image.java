@@ -1,5 +1,6 @@
 package com.adviser.imgsrc;
 
+
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.FontMetrics;
@@ -15,10 +16,6 @@ import java.util.regex.Pattern;
 
 import javax.management.RuntimeErrorException;
 
-import lombok.Data;
-import lombok.val;
-
-@Data
 public class Image {
   // private static final Logger LOGGER = LoggerFactory.getLogger(Image.class);
 
@@ -32,6 +29,7 @@ public class Image {
   private String text = null;
   private String path = null;
   private int wait = 0;
+  private int colorSpace;
 
   private Format format = null;
 
@@ -73,7 +71,7 @@ public class Image {
   }
 
   private boolean frame = false;
-  private static Pattern _frame = Pattern.compile("(.*)\\.[×xX](.*)");
+  private static Pattern _frame = Pattern.compile("(.*)\\.[xX](.*)");
 
   private String hasFrame(String path) {
     Matcher match = _frame.matcher(path);
@@ -88,13 +86,12 @@ public class Image {
 
   private static final Pattern RENUMBER = Pattern.compile("\\p{Digit}{1,4}");
   private static final Pattern REWIDTHHEIGHT = Pattern
-      .compile("(\\p{Digit}{1,4})[×xX](\\p{Digit}{1,4})");
+      .compile("(\\p{Digit}{1,4})[xX](\\p{Digit}{1,4})");
   private static final Pattern REASPECTHEIGHT = Pattern
-      .compile("(\\p{Digit}{1,4}):(\\p{Digit}{1,4})[×xX](\\p{Digit}{1,4})");
+      .compile("(\\p{Digit}{1,4}):(\\p{Digit}{1,4})[xX](\\p{Digit}{1,4})");
   private static final Pattern REWIDTHASPECT = Pattern
-      .compile("(\\p{Digit}{1,4})[×xX](\\p{Digit}{1,4}):(\\p{Digit}{1,4})");
+      .compile("(\\p{Digit}{1,4})[xX](\\p{Digit}{1,4}):(\\p{Digit}{1,4})");
 
-  @Data
   private static class AspectRatio {
     private final String fullName;
     private final String shortName;
@@ -108,33 +105,51 @@ public class Image {
       this.regEx = Pattern.compile(regEx);
       this.ratio = ratio;
     }
+
+    public String getFullName() {
+      return fullName;
+    }
+
+    @SuppressWarnings("unused")
+    public String getShortName() {
+      return shortName;
+    }
+
+    @SuppressWarnings("unused")
+    public Pattern getRegEx() {
+      return regEx;
+    }
+
+    public String getRatio() {
+      return ratio;
+    }
   }
 
   private static List<AspectRatio> standardAspectRatios() {
     final List<AspectRatio> ret = new ArrayList<AspectRatio>();
-    ret.add(new AspectRatio("mediumrectangle", "medrect", "300×250",
+    ret.add(new AspectRatio("mediumrectangle", "medrect", "300x250",
         "^(med)\\w+(rec\\w+)$"));
 
-    ret.add(new AspectRatio("squarepopup", "sqrpop", "250×250", "^(s\\w+pop)$"));
-    ret.add(new AspectRatio("verticalrectangle", "vertrec", "240×400",
+    ret.add(new AspectRatio("squarepopup", "sqrpop", "250x250", "^(s\\w+pop)$"));
+    ret.add(new AspectRatio("verticalrectangle", "vertrec", "240x400",
         "^(ver)\\w+(rec)$"));
-    ret.add(new AspectRatio("largerectangle", "lrgrec", "336×280",
+    ret.add(new AspectRatio("largerectangle", "lrgrec", "336x280",
         "^(large|lrg)(rec)$"));
-    ret.add(new AspectRatio("rectangle", "rec", "180×150", "^(rec)$"));
-    ret.add(new AspectRatio("popunder", "pop", "720×300", "^(pop)$"));
-    ret.add(new AspectRatio("fullbanner", "fullban", "468×60", "^(f\\w+ban)$"));
-    ret.add(new AspectRatio("halfbanner", "halfban", "234×60", "^(h\\w+ban)$"));
-    ret.add(new AspectRatio("microbar", "mibar", "88×31", "^(m\\w+bar)$"));
-    ret.add(new AspectRatio("button1", "but1", "120×90", "^(b\\w+1)$"));
-    ret.add(new AspectRatio("button2", "but2", "120×60", "^(b\\w+2)$"));
-    ret.add(new AspectRatio("verticalbanner", "vertban", "120×240",
+    ret.add(new AspectRatio("rectangle", "rec", "180x150", "^(rec)$"));
+    ret.add(new AspectRatio("popunder", "pop", "720x300", "^(pop)$"));
+    ret.add(new AspectRatio("fullbanner", "fullban", "468x60", "^(f\\w+ban)$"));
+    ret.add(new AspectRatio("halfbanner", "halfban", "234x60", "^(h\\w+ban)$"));
+    ret.add(new AspectRatio("microbar", "mibar", "88x31", "^(m\\w+bar)$"));
+    ret.add(new AspectRatio("button1", "but1", "120x90", "^(b\\w+1)$"));
+    ret.add(new AspectRatio("button2", "but2", "120x60", "^(b\\w+2)$"));
+    ret.add(new AspectRatio("verticalbanner", "vertban", "120x240",
         "^(ver\\w+ban)$"));
-    ret.add(new AspectRatio("squarebutton", "sqrbut", "125×125", "^(s\\w+but)$"));
-    ret.add(new AspectRatio("leaderboard", "leadbrd", "728×90", "^(lea\\w+rd)$"));
-    ret.add(new AspectRatio("wideskyscraper", "wiskyscrpr", "160×600",
+    ret.add(new AspectRatio("squarebutton", "sqrbut", "125x125", "^(s\\w+but)$"));
+    ret.add(new AspectRatio("leaderboard", "leadbrd", "728x90", "^(lea\\w+rd)$"));
+    ret.add(new AspectRatio("wideskyscraper", "wiskyscrpr", "160x600",
         "^(w\\w+sk\\w+r)$"));
-    ret.add(new AspectRatio("skyscraper", "skyscrpr", "120×600", "^(sk\\w+r)$"));
-    ret.add(new AspectRatio("halfpage", "hpge", "300×600", "^(h\\w+g)$"));
+    ret.add(new AspectRatio("skyscraper", "skyscrpr", "120x600", "^(sk\\w+r)$"));
+    ret.add(new AspectRatio("halfpage", "hpge", "300x600", "^(h\\w+g)$"));
     return ret;
   }
 
@@ -148,17 +163,18 @@ public class Image {
     }
   }
 
-  private static Steps<Image> getSteps() {
+  protected static Steps<Image> getSteps() {
     if (_steps != null) {
       return _steps;
     }
     _steps = new Steps<Image>();
 
-    _steps.add(new Step<Image>("Width") {
+    _steps.add(new Step<Image>("Dimension") {
 
       public Step<Image> parse(Image img, String data) {
         for (final AspectRatio ar : aspectRatios) {
-          if (ar.getFullName().equalsIgnoreCase(data)) {
+          if (ar.getFullName().equalsIgnoreCase(data) ||
+              ar.getShortName().equalsIgnoreCase(data)) {
             img.setText(data);
             data = ar.getRatio();
             break;
@@ -176,14 +192,12 @@ public class Image {
         if (aspectheight.matches()) {
           final int width = (int) (Integer.parseInt(aspectheight.group(3)) * getAspectRatio(
               aspectheight.group(1), aspectheight.group(2)));
-          img.setText(data);
           data = Integer.toString(width) + "x" + aspectheight.group(3);
         } else {
           final Matcher widthaspect = REWIDTHASPECT.matcher(data);
           if (widthaspect.matches()) {
             final int height = (int) (Integer.parseInt(widthaspect.group(1)) * getAspectRatio(
-                widthaspect.group(2), widthaspect.group(3)));
-            img.setText(data);
+                widthaspect.group(3), widthaspect.group(2)));
             data = widthaspect.group(1) + "x" + Integer.toString(height);
           }
         }
@@ -230,7 +244,7 @@ public class Image {
   }
 
   public static Image fromPath(String path) {
-    final val img = new Image();
+    final Image img = new Image();
     /*
      * /height/width/backcolor/textcolor/text<.format>
      */
@@ -287,8 +301,9 @@ public class Image {
       throw new RuntimeErrorException(new Error("Image too big max 4096x4096:"
           + width + "x" + height));
     }
+    System.err.println("XXXX:"+this.getColorSpace()+":"+this.getFormat().getMime());
     final BufferedImage image = new BufferedImage(width, height,
-        BufferedImage.TYPE_INT_ARGB);
+        this.getColorSpace());
     final Graphics2D graph = image.createGraphics();
     if (this.isFrame()) {
       graph.setPaint(textcolor);
@@ -306,5 +321,90 @@ public class Image {
     graph.setColor(textcolor);
     drawCenteredString(this.getText(), width, height, graph);
     return image;
+  }
+
+  public Color getBackcolor() {
+    return backcolor;
+  }
+
+  public void setBackcolor(Color backcolor) {
+    this.backcolor = backcolor;
+  }
+
+  public Color getTextcolor() {
+    return textcolor;
+  }
+
+  public void setTextcolor(Color textcolor) {
+    this.textcolor = textcolor;
+  }
+
+  public String getPath() {
+    return path;
+  }
+
+  public void setPath(String path) {
+    this.path = path;
+  }
+
+  public void setText(String text) {
+    this.text = text;
+  }
+
+  public Format getFormat() {
+    return format;
+  }
+
+  public void setFormat(Format format) {
+    this.format = format;
+    this.colorSpace = format.getColorSpace();
+  }
+
+  public int getWidth() {
+    return width;
+  }
+
+  public void setWidth(int width) {
+    this.width = width;
+  }
+
+  public int getHeight() {
+    return height;
+  }
+
+  public void setHeight(int height) {
+    this.height = height;
+  }
+
+  public int getWait() {
+    return wait;
+  }
+
+  public void setWait(int wait) {
+    this.wait = wait;
+  }
+
+  public boolean isFrame() {
+    return frame;
+  }
+
+  public void setFrame(boolean frame) {
+    this.frame = frame;
+  }
+
+  public boolean isRedirect() {
+    return redirect;
+  }
+
+  public void setRedirect(boolean redirect) {
+    this.redirect = redirect;
+  }
+
+  public int getColorSpace() {
+    return colorSpace;
+  }
+
+  public void setColorSpace(int colorSpace) {
+    this.colorSpace = colorSpace;
   }
 }

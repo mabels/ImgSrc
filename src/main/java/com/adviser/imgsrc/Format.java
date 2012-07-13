@@ -7,12 +7,11 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-//@Data
 abstract class Format {
   public abstract String getFormat();
   public abstract String getMime();
   public abstract String getSuffix();
-
+  public abstract int getColorSpace();  
   //private String cleanPath;
 
   private static Map<String, Format> _factory = null;

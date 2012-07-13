@@ -1,17 +1,26 @@
 package com.adviser.imgsrc;
 
 import java.awt.image.BufferedImage;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
 
 //@Suffix(".png")
-@Data
-@EqualsAndHashCode(callSuper=false)
 
 class Format_png extends Format {
-  private String format = "PNG";
-  private String mime = "image/png";
-  private int colorSpace = BufferedImage.TYPE_INT_RGB;
-  private String suffix = ".png";
-
+  private final String format = "PNG";
+  private final String mime = "image/png";
+  private final int colorSpace = BufferedImage.TYPE_INT_RGB;
+  private final String suffix = ".png";
+  
+  public String getFormat() {
+    return format;
+  }
+  public String getMime() {
+    return mime;
+  }
+  public int getColorSpace() {
+    return colorSpace;
+  }
+  public String getSuffix() {
+    return suffix;
+  }
+  
 }
