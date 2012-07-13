@@ -126,7 +126,7 @@ public class IsWhat {
   private static final Pattern RE6RGBA = Pattern
       .compile("^\\p{XDigit}{6},\\p{Digit}{1,2}$");
 
-  private final Color asColor(String param) {
+  private Color asColor(String param) {
     String s = param; //sonar
     final char first = s.charAt(0);
     int len = s.length();

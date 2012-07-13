@@ -70,7 +70,7 @@ public class Image {
   }
 
   private boolean frame = false;
-  private final static Pattern REFRAME = Pattern.compile("(.*)\\.[xX](.*)");
+  private static final Pattern REFRAME = Pattern.compile("(.*)\\.[xX](.*)");
 
   private String hasFrame(String path) {
     Matcher match = REFRAME.matcher(path);
@@ -152,7 +152,7 @@ public class Image {
     return ret;
   }
 
-  private final static List<AspectRatio> ASPECTRATIOS = standardAspectRatios();
+  private static final List<AspectRatio> ASPECTRATIOS = standardAspectRatios();
 
   private static float getAspectRatio(String zaehler, String nenner) {
     try {
@@ -162,7 +162,7 @@ public class Image {
     }
   }
 
-  private final static String translateStandardRatios(String data, Image img) {
+  private static final String translateStandardRatios(String data, Image img) {
     for (final AspectRatio ar : ASPECTRATIOS) {
       if (ar.getFullName().equalsIgnoreCase(data)
           || ar.getShortName().equalsIgnoreCase(data)) {
@@ -261,7 +261,7 @@ public class Image {
     return img;
   }
 
-  private final static Pattern RESPACE = Pattern.compile("^[\\._\\-\\*\\+ ]$");
+  private static final Pattern RESPACE = Pattern.compile("^[\\._\\-\\*\\+ ]$");
 
   public String getText() {
     if (text != null) {
