@@ -9,6 +9,8 @@ import org.slf4j.LoggerFactory;
 
 public final class Server {
 
+  private Server() {
+  }
   private static final Logger LOGGER = LoggerFactory.getLogger(Router.class);
   
   public static void main(String[] args) {

@@ -136,7 +136,7 @@ public class Router extends RouteBuilder {
     out.setHeader("cache-control", constant("max-age=315360000"));
     out.setHeader("expires", "Thu, 31 Dec 2037 23:55:55 GMT");
   }
-  public void Imager(Exchange exchange) {
+  public void imager(Exchange exchange) {
     final Message in = exchange.getIn();
     try {
       final String path = in.getHeader(Exchange.HTTP_PATH, String.class);

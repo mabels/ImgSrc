@@ -278,8 +278,9 @@ public class Image {
     int proz = 80;
     while (proz > 10) {
       final int fheight = (Math.min(h, w) * proz) / 100;
-      if (fheight < 3)
+      if (fheight < 3) {
         return;
+      }
       final Font font = new Font("Sans-Serif", Font.PLAIN, fheight);
       g.setFont(font);
       final FontMetrics fm = g.getFontMetrics();
