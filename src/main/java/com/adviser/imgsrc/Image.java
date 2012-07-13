@@ -8,7 +8,7 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.LinkedList;
+import java.util.Deque;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -256,7 +256,7 @@ public class Image {
     path = img.getPath();
     path = img.hasFrame(path);
 
-    LinkedList<String> datas = Steps.splitPath(path);
+    Deque<String> datas = Steps.splitPath(path);
     getSteps().parse(img, datas);
     return img;
   }
