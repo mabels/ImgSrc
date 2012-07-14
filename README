@@ -15,8 +15,10 @@ you could access the images with this url schema
 
 _ height is a number in pixel max 2048
 _ width is a number in pixel max 2048
-_ backcolor is a hexnumber with 3 or 6 digits or 4 or 6 digits (RGBA) channel
-_ textcolor is a hexnumber with 3 or 6 digits or 4 or 6 digits (RGBA) channel
+_ height and width could be aspectsratios like 16:9
+_ backcolor is a hexnumber with 1 or 3 or 6 digits and 2 or 4 or 6 digits (RGBA) channel
+_ textcolor is a hexnumber with 2 or 3 or 6 digits and 2 or 4 or 6 digits (RGBA) channel
+_ textcolor and backcolor in RGBA could be writen A,50 (#AAAAAA,50%)
 _ text is a string if the string is to long nothing will be shown
 _ format is
   * .png for PNG Images

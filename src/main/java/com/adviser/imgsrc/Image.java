@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -274,7 +275,8 @@ public class Image {
   }
 
   public void drawCenteredString(String s, int w, int h, Graphics2D g) {
-
+    g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, // Anti-alias!
+        RenderingHints.VALUE_ANTIALIAS_ON);
     int proz = 80;
     while (proz > 10) {
       final int fheight = (Math.min(h, w) * proz) / 100;
