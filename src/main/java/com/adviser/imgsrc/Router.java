@@ -70,7 +70,7 @@ public class Router extends RouteBuilder {
     LOGGER.info("Version:" + getServer());
     LOGGER.info("Listen On:" + listenaddress.toString());
     from("jetty:http://" + listenaddress.toString() + "?matchOnUriPrefix=true")
-        .bean(this, "Imager");
+        .bean(this, "imager");
   }
 
   public ByteArrayOutputStream cachedProcessing(Image image) throws IOException {
