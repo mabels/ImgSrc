@@ -79,6 +79,7 @@ public class IsWhat {
     String[] parts = s.split(",");
     int precend = (int) ((Integer.parseInt(parts[1], 10) / 100f) * 255f);
     final Color temp = asRGBColor(parts[0]);
+    colorSpace = BufferedImage.TYPE_4BYTE_ABGR;
     return new Color(temp.getRed(), temp.getGreen(), temp.getBlue(), precend);
   }
 
