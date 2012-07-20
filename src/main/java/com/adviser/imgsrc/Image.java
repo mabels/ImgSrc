@@ -8,6 +8,7 @@ import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Deque;
 import java.util.List;
@@ -16,8 +17,11 @@ import java.util.regex.Pattern;
 
 import javax.management.RuntimeErrorException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class Image {
-  // private static final Logger LOGGER = LoggerFactory.getLogger(Image.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(Image.class);
 
   private static final int MAXDIM = 4096;
   private boolean redirect = false;
@@ -110,7 +114,6 @@ public class Image {
       return fullName;
     }
 
-    @SuppressWarnings("unused")
     public String getShortName() {
       return shortName;
     }
@@ -274,23 +277,80 @@ public class Image {
     return "" + width + "x" + height;
   }
 
-  public void drawCenteredString(String s, int w, int h, Graphics2D g) {
+  private static class FindFontsize {
+
+    private Graphics2D g;
+    private Font font;
+    private String[] lines;
+    private int min;
+    private int max;
+    
+    public FindFontsize(Graphics2D g, Font font, String[] lines, int max, int min) {
+      this.g = g;
+      this.font = font;
+      this.lines = lines;
+      this.min = min;
+      this.max = max;
+    }
+   
+    private boolean fitTextInWidth(Graphics2D g, Font font, String[] lines,
+        int width, int fheight) {
+      font = font.deriveFont(fheight);
+      g.setFont(font);
+      final FontMetrics fm = g.getFontMetrics();
+      for (String line : lines) {
+        if (fm.stringWidth(line) > width) {
+          return false;
+        }
+      }
+      return true;
+    }
+
+    public int findFontsizeFromWidth(int width, int pos) {
+      final int mid = min+((pos-min)/2);
+    
+      final boolean resultMin = fitTextInWidth(g, font, lines, width, mid);
+      if (resultMin) {
+        return findFontsizeFromWidth(width, mid+((max-mid)/2));
+      } else {
+        return findFontsizeFromWidth(mid-((mid-min)/2));
+      }
+  
+  }
+
+  public void drawCenteredString(String s, int w, int h, Graphics2D g)
+      throws UnsupportedEncodingException {
     g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, // Anti-alias!
         RenderingHints.VALUE_ANTIALIAS_ON);
     int proz = 80;
-    while (proz > 10) {
-      final int fheight = (Math.min(h, w) * proz) / 100;
+    final Font font = new Font("Sans-Serif", Font.PLAIN, 10/* const */);
+
+    int max = heigth * (95 / 100);
+    int min = heigth * (5 / 100);
+
+    findFontsizeFromWidth(g, font, s.split("[\n\r]+"), width, max, min);
+
+    while (proz > 5) {
+      final int fheight = (w * proz) / 100;
       if (fheight < 3) {
+        LOGGER.debug("drawCenteredString:reached end:" + fheight);
         return;
       }
-      final Font font = new Font("Sans-Serif", Font.PLAIN, fheight);
       g.setFont(font);
+
       final FontMetrics fm = g.getFontMetrics();
       final int sw = fm.stringWidth(s);
+      LOGGER.debug("drawCenteredString:font:" + sw + "x" + w + ":" + font + ":"
+          + proz);
       if (sw < w) {
-        final int x = (w - sw) / 2;
-        final int y = (fm.getAscent() + (h - (fm.getAscent() + fm.getDescent())) / 2);
-        g.drawString(s, x, y);
+        for (String line : lines) {
+          final int x = (w - sw) / 2;
+          final int y = ((fm.getAscent()) + (h - ((fm.getAscent() + fm
+              .getDescent()))) / 2);
+          LOGGER.debug("drawCenteredString:drawString:" + line + ":" + sw + "x"
+              + fheight);
+          g.drawString(line, x, y);
+        }
         break;
       }
       proz -= 5;
@@ -303,7 +363,7 @@ public class Image {
 
   private static final int BORDER = 5;
 
-  public BufferedImage drawImage() {
+  public BufferedImage drawImage() throws UnsupportedEncodingException {
     if (width > MAXDIM || height > MAXDIM) {
       throw new RuntimeErrorException(new Error("Image too big max 4096x4096:"
           + width + "x" + height));
