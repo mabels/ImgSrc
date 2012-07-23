@@ -14,22 +14,22 @@ abstract class Format {
   public abstract int getColorSpace();  
   //private String cleanPath;
 
-  private static Map<String, Format> _factory = null;
+  private static Map<String, Format> formatFactory = null;
 
   private static Map<String, Format> factory() {
-    if (_factory == null) {
-      _factory = new java.util.concurrent.ConcurrentHashMap<String, Format>();
+    if (formatFactory == null) {
+      formatFactory = new java.util.concurrent.ConcurrentHashMap<String, Format>();
       Format tmp;
       tmp = new Format_png();
-      _factory.put(tmp.getSuffix(), tmp);
+      formatFactory.put(tmp.getSuffix(), tmp);
       tmp = new Format_jpg();
-      _factory.put(tmp.getSuffix(), tmp);
+      formatFactory.put(tmp.getSuffix(), tmp);
       tmp = new Format_gif();
-      _factory.put(tmp.getSuffix(), tmp);
+      formatFactory.put(tmp.getSuffix(), tmp);
       tmp = new Format_ico();
-      _factory.put(tmp.getSuffix(), tmp);
+      formatFactory.put(tmp.getSuffix(), tmp);
     }
-    return _factory;
+    return formatFactory;
   }
 
   public ByteArrayOutputStream getStream(BufferedImage img) throws IOException {
@@ -37,12 +37,12 @@ abstract class Format {
     javax.imageio.ImageIO.write(img, getFormat(), ret);
     return ret;
   }
-  private static Pattern _suffix = Pattern.compile("(.*)(\\.\\w{3})(.*)");
+  private final static Pattern RESUFFIX = Pattern.compile("(.*)(\\.\\w{3})(.*)");
 
   public static Format fromPath(String paramPath, Image img) {
     String path = paramPath;
     Format ret = null;
-    Matcher suffix = _suffix.matcher(path);
+    Matcher suffix = RESUFFIX.matcher(path);
     if (suffix.matches()) {
       ret = factory().get(suffix.group(2));
       if (ret != null) {

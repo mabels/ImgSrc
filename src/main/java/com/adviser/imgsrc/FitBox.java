@@ -238,11 +238,11 @@ public class FitBox {
   public String[] getLines() {
     return lines;
   }
-
+  
   public void setLines(String[] lines) {
     this.lines = lines;
   }
-
+  
   public Rectangle getBox() {
     return box;
   }

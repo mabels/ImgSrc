@@ -45,7 +45,15 @@ public class Image {
     try {
       wait = Integer.parseInt((String) o);
     } catch (Exception e) {
-      wait = (int) (Math.random() * 1000);
+      String[] s = ((String)o).split(":");
+      try {
+        int begin = Integer.parseInt(s[0]);
+        int end = Integer.parseInt(s[1]);
+        int diff = Math.abs(begin-end);
+        wait = (int) (Math.random() * diff) + begin;
+      } catch (Exception e1) {
+        wait = (int) (Math.random() * 1000);
+      }
     }
   }
 
@@ -75,7 +83,7 @@ public class Image {
   }
 
   private boolean frame = false;
-  private static final Pattern REFRAME = Pattern.compile("(.*)\\.[xX](.*)");
+  private static final Pattern REFRAME = Pattern.compile("^(.*)\\.[xX](.*)$", Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
 
   private String hasFrame(String path) {
     Matcher match = REFRAME.matcher(path);
@@ -166,7 +174,7 @@ public class Image {
     }
   }
 
-  private static final String translateStandardRatios(String data, Image img) {
+  private static String translateStandardRatios(String data, Image img) {
     for (final AspectRatio ar : ASPECTRATIOS) {
       if (ar.getFullName().equalsIgnoreCase(data)
           || ar.getShortName().equalsIgnoreCase(data)) {
