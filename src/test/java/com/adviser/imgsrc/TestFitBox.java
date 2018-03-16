@@ -17,7 +17,7 @@ import org.slf4j.LoggerFactory;
 
 public class TestFitBox {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(Router.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(TestFitBox.class);
 
   private BufferedImage image;
   private Graphics2D graph;
@@ -269,13 +269,13 @@ public class TestFitBox {
     FitBox.Aligner aligner = new FitBox.Aligner(fitbox);
     FitBox.Aligner.Align align = aligner.getAlign(">Meno");
     assertEquals("Meno", align.getLine());
-    assertEquals(296, align.getStartX()); 
+    assertEquals(299, align.getStartX());
     aligner.getAlign("oneM");
     assertEquals("oneM", align.getLine());
-    assertEquals(296, align.getStartX());     
+    assertEquals(299, align.getStartX());
     aligner.getAlign(">oneM");
     assertEquals("oneM", align.getLine());
-    assertEquals(296, align.getStartX());     
+    assertEquals(299, align.getStartX());
   }
   
   
@@ -287,13 +287,13 @@ public class TestFitBox {
     FitBox.Aligner aligner = new FitBox.Aligner(fitbox);
     FitBox.Aligner.Align align = aligner.getAlign("Meno");
     assertEquals("Meno", align.getLine());
-    assertEquals(163, align.getStartX()); 
+    assertEquals(165, align.getStartX());
     aligner.getAlign("=oneM");
     assertEquals("oneM", align.getLine());
-    assertEquals(163, align.getStartX()); 
+    assertEquals(165, align.getStartX());
     aligner.getAlign("uneM");
     assertEquals("uneM", align.getLine());
-    assertEquals(163, align.getStartX()); 
+    assertEquals(165, align.getStartX());
   }
 
 }

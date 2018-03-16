@@ -31,5 +31,10 @@ public class TestFormatFactory {
     assertEquals(".jpg", Format.fromPath("/meno/doof.jpg/lala", img).getSuffix());  
     assertEquals(".jpg", Format.fromPath("/meno/doof.jpg", img).getSuffix());  
   }
-
+  @Test
+  public void testSvg() {
+    Image img = new Image();
+    assertEquals(".svg", Format.fromPath("/meno/doof.svg/lala", img).getSuffix());
+    assertEquals(".svg", Format.fromPath("/meno/doof.svg", img).getSuffix());
+  }
 }

@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Deque;
+import java.util.Enumeration;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -37,22 +38,26 @@ public class Image {
 
   private Format format = null;
 
-  public void setWait(Object o) {
+  public void setWait(Enumeration<String> o) {
     // LOGGER.debug("setWait:"+o);
     if (o == null) {
       return;
     }
-    try {
-      wait = Integer.parseInt((String) o);
-    } catch (Exception e) {
-      String[] s = ((String)o).split(":");
+    while (o.hasMoreElements()) {
+      final String str = o.nextElement();
       try {
-        int begin = Integer.parseInt(s[0]);
-        int end = Integer.parseInt(s[1]);
-        int diff = Math.abs(begin-end);
-        wait = (int) (Math.random() * diff) + begin;
-      } catch (Exception e1) {
-        wait = (int) (Math.random() * 1000);
+        wait = Integer.parseInt(str);
+        break;
+      } catch (Exception e) {
+        String[] s = str.split(":");
+        try {
+          int begin = Integer.parseInt(s[0]);
+          int end = Integer.parseInt(s[1]);
+          int diff = Math.abs(begin - end);
+          wait = (int) (Math.random() * diff) + begin;
+        } catch (Exception e1) {
+          wait = (int) (Math.random() * 1000);
+        }
       }
     }
   }
@@ -67,7 +72,7 @@ public class Image {
   }
 
   public String getFullPath() {
-    final StringBuffer sb = new StringBuffer();
+    final StringBuilder sb = new StringBuilder();
     sb.append("/");
     sb.append(Integer.toString(this.getWidth()));
     sb.append("x");
@@ -96,6 +101,7 @@ public class Image {
 
   private static Steps<Image> steps = null;
 
+  private static final int BORDER = 5;
   private static final Pattern RENUMBER = Pattern.compile("\\p{Digit}{1,4}");
   private static final Pattern REWIDTHHEIGHT = Pattern
       .compile("(\\p{Digit}{1,4})[xX](\\p{Digit}{1,4})");
@@ -285,23 +291,20 @@ public class Image {
     return "" + width + "x" + height;
   }
 
- 
-
   public ByteArrayOutputStream getStream() throws IOException {
-    return getFormat().getStream(drawImage());
+    return getFormat().getStream();
   }
 
-  private static final int BORDER = 5;
 
-  public BufferedImage drawImage() throws UnsupportedEncodingException {
+  public Graphics2D drawImage() throws UnsupportedEncodingException {
     if (width > MAXDIM || height > MAXDIM) {
       throw new RuntimeErrorException(new Error("Image too big max 4096x4096:"
           + width + "x" + height));
     }
     // System.err.println("XXXX:"+this.getColorSpace()+":"+this.getFormat().getMime());
-    final BufferedImage image = new BufferedImage(width, height,
-        this.getColorSpace());
-    final Graphics2D graph = image.createGraphics();
+
+    final Graphics2D graph = getFormat().getGraphics2D(width, height, this.getColorSpace());
+
     if (this.isFrame()) {
       graph.setPaint(textcolor);
       graph.fillRect(0, 0, width, height);
@@ -322,7 +325,7 @@ public class Image {
     fitBox.setLines(this.getText());
     fitBox.setBox(new Rectangle(0, 0, width, height));
     fitBox.draw();
-    return image;
+    return graph;
   }
 
   public Color getBackcolor() {

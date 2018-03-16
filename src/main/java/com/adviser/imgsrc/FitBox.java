@@ -11,7 +11,7 @@ import org.slf4j.LoggerFactory;
 
 public class FitBox {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(Router.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(FitBox.class);
 
   private final Graphics2D g;
   private final Font font;

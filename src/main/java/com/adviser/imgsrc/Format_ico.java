@@ -1,5 +1,6 @@
 package com.adviser.imgsrc;
 
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -11,10 +12,19 @@ class Format_ico extends Format {
   private final String mime = "image/x-icon";
   private final int colorSpace = BufferedImage.TYPE_INT_RGB;
   private final String suffix = ".ico";
+  private final PixelRender render;
 
-  public ByteArrayOutputStream getStream(BufferedImage img) throws IOException {
+  Format_ico() {
+    this.render = new PixelRender();
+  }
+
+  public Graphics2D getGraphics2D(int width, int height, int colorSpace) {
+    return this.render.getGraphics2D(width, height, colorSpace);
+  }
+
+  public ByteArrayOutputStream getStream() throws IOException {
     ByteArrayOutputStream ret = new ByteArrayOutputStream();
-    ICOEncoder.write(img, ret);
+    ICOEncoder.write(this.render.image, ret);
     return ret;
   }
 

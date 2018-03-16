@@ -1,5 +1,6 @@
 package com.adviser.imgsrc;
 
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -9,9 +10,17 @@ import java.util.regex.Pattern;
 
 abstract class Format {
   public abstract String getFormat();
+
   public abstract String getMime();
+
   public abstract String getSuffix();
-  public abstract int getColorSpace();  
+
+  public abstract int getColorSpace();
+
+  public abstract Graphics2D getGraphics2D(int width, int height, int colorSpace);
+
+  public abstract ByteArrayOutputStream getStream() throws IOException;
+  
   //private String cleanPath;
 
   private static Map<String, Format> formatFactory = null;
@@ -28,15 +37,12 @@ abstract class Format {
       formatFactory.put(tmp.getSuffix(), tmp);
       tmp = new Format_ico();
       formatFactory.put(tmp.getSuffix(), tmp);
+      tmp = new Format_svg();
+      formatFactory.put(tmp.getSuffix(), tmp);
     }
     return formatFactory;
   }
 
-  public ByteArrayOutputStream getStream(BufferedImage img) throws IOException {
-    ByteArrayOutputStream ret = new ByteArrayOutputStream();
-    javax.imageio.ImageIO.write(img, getFormat(), ret);
-    return ret;
-  }
   private final static Pattern RESUFFIX = Pattern.compile("(.*)(\\.\\w{3})(.*)");
 
   public static Format fromPath(String paramPath, Image img) {
