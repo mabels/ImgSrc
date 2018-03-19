@@ -2,6 +2,7 @@ package com.adviser.imgsrc;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
 
 import java.awt.Font;
 import java.awt.Graphics2D;
@@ -14,6 +15,10 @@ import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static org.hamcrest.CoreMatchers.allOf;
+import static org.hamcrest.Matchers.greaterThan;
+import static org.hamcrest.Matchers.lessThan;
 
 public class TestFitBox {
 
@@ -55,7 +60,7 @@ public class TestFitBox {
       // LOGGER.debug("*********** Tried length:"+i+" got " + fontSize);
       sb.append(comma + fontSize);
       comma = ",";
-      assertEquals((double) refSizes1Line[i - 1], (double) fontSize, 1);
+      assertEquals((double) refSizes1Line[i - 1], (double) fontSize, 5 + (refSizes1Line[i - 1] * 0.1));
       // System.err.println("RESULT:"+fontSize);
       // assertEquals(10, fontSize);
     }
@@ -102,7 +107,7 @@ public class TestFitBox {
       // LOGGER.debug("*********** Tried length:"+i+" got " + fontSize);
       sb.append(comma + fontSize);
       comma = ",";
-      assertEquals((double) refSizes2Line[i - 1], (double) fontSize, 1);
+      assertEquals((double) refSizes2Line[i - 1], (double) fontSize, 1 + (refSizes2Line[i - 1] * 0.1));
       // System.err.println("RESULT:"+fontSize);
       // assertEquals(10, fontSize);
     }
@@ -172,7 +177,10 @@ public class TestFitBox {
       String[] strArray = new String[lines.size()];
       fitbox.setLines(lines.toArray(strArray));
       final int fontSize = fitbox.findVerticalFontsize();
-      assertEquals((double) refVerticalSizes[i], (double) fontSize, 1);
+      assertEquals((double) refVerticalSizes[i], (double) fontSize, 1 + (refVerticalSizes[i]*0.1));
+//      assertThat((double)fontSize, allOf(
+//          greaterThen(refVerticalSizes[i] - (refVerticalSizes[i] * 0.1)),
+//          (double) fontSize, 1);
       // LOGGER.debug("testVerticalLines="+i+":"+fontSize);
       lines.add("Huh");
       sb.append(comma + fontSize);
@@ -242,7 +250,7 @@ public class TestFitBox {
     assertEquals(FitBox.TEXTTOOSMALL, fitbox.findBoxFontsize());
    }
 
-  
+
   @Test
   public void testLeftAlign() {
     FitBox fitbox = new FitBox(graph, font);
@@ -251,16 +259,16 @@ public class TestFitBox {
     FitBox.Aligner aligner = new FitBox.Aligner(fitbox);
     FitBox.Aligner.Align align = aligner.getAlign("<Meno");
     assertEquals("Meno", align.getLine());
-    assertEquals(30, align.getStartX()); 
+    assertEquals(30, align.getStartX());
     aligner.getAlign("Uhu");
     assertEquals("Uhu", align.getLine());
-    assertEquals(30, align.getStartX());     
+    assertEquals(30, align.getStartX());
     aligner.getAlign("<Uhu");
     assertEquals("Uhu", align.getLine());
-    assertEquals(30, align.getStartX());     
+    assertEquals(30, align.getStartX());
   }
-  
-  
+
+
   @Test
   public void testRightAlign() {
     FitBox fitbox = new FitBox(graph, font);
@@ -269,16 +277,16 @@ public class TestFitBox {
     FitBox.Aligner aligner = new FitBox.Aligner(fitbox);
     FitBox.Aligner.Align align = aligner.getAlign(">Meno");
     assertEquals("Meno", align.getLine());
-    assertEquals(299, align.getStartX());
+    assertThat(align.getStartX(), allOf(greaterThan(290), lessThan(300)));
     aligner.getAlign("oneM");
     assertEquals("oneM", align.getLine());
-    assertEquals(299, align.getStartX());
+    assertThat(align.getStartX(), allOf(greaterThan(290), lessThan(300)));
     aligner.getAlign(">oneM");
     assertEquals("oneM", align.getLine());
-    assertEquals(299, align.getStartX());
+    assertThat(align.getStartX(), allOf(greaterThan(290), lessThan(300)));
   }
-  
-  
+
+
   @Test
   public void testCenterAlign() {
     FitBox fitbox = new FitBox(graph, font);
@@ -287,13 +295,13 @@ public class TestFitBox {
     FitBox.Aligner aligner = new FitBox.Aligner(fitbox);
     FitBox.Aligner.Align align = aligner.getAlign("Meno");
     assertEquals("Meno", align.getLine());
-    assertEquals(165, align.getStartX());
+    assertEquals(165, align.getStartX(), 165 * 0.1);
     aligner.getAlign("=oneM");
     assertEquals("oneM", align.getLine());
-    assertEquals(165, align.getStartX());
+    assertEquals(165, align.getStartX(), 165 * 0.1);
     aligner.getAlign("uneM");
     assertEquals("uneM", align.getLine());
-    assertEquals(165, align.getStartX());
+    assertEquals(165, align.getStartX(), 165 * 0.1);
   }
 
 }

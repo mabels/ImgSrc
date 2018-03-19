@@ -1,13 +1,9 @@
 package com.adviser.imgsrc;
 
-import java.awt.Font;
-import java.awt.FontMetrics;
-import java.awt.Graphics2D;
-import java.awt.Rectangle;
-import java.awt.RenderingHints;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.awt.*;
 
 public class FitBox {
 
@@ -39,7 +35,7 @@ public class FitBox {
 
       startY = fitbox.box.y
           + ((fitbox.box.height / 2) - (fitbox.lines.length
-              * (fm.getAscent() + fm.getDescent() + fm.getLeading()) / 2))
+          * (fm.getAscent() + fm.getDescent() + fm.getLeading()) / 2))
           + fm.getAscent();
       currentAlign = getAlign("="); // default center align
     }
@@ -69,34 +65,34 @@ public class FitBox {
         return fitbox.box.x
             + ((fitbox.box.width / 2) - (fm.stringWidth(getLine()) / 2));
       }
-    }; 
+    };
     private final Align leftAlign = new Align() {
       public int getStartX() {
         return fitbox.box.x;
       }
     };
-    
+
     public Align getAlign(String line) {
       if (line == null || line.length() == 0) {
         return currentAlign;
       }
 
       switch (line.charAt(0)) {
-      case '=':
-        currentAlign = centerAlign;
-        currentAlign.line = line.substring(1);
-        break;
-      case '<':
-        currentAlign = leftAlign;
-        currentAlign.line = line.substring(1);
-        break;
-      case '>':
-        currentAlign = rightAlign;
-        currentAlign.line = line.substring(1);
-        break;
-      default:
-        currentAlign.line = line;
-        break;
+        case '=':
+          currentAlign = centerAlign;
+          currentAlign.line = line.substring(1);
+          break;
+        case '<':
+          currentAlign = leftAlign;
+          currentAlign.line = line.substring(1);
+          break;
+        case '>':
+          currentAlign = rightAlign;
+          currentAlign.line = line.substring(1);
+          break;
+        default:
+          currentAlign.line = line;
+          break;
       }
       return currentAlign;
     }
@@ -238,11 +234,11 @@ public class FitBox {
   public String[] getLines() {
     return lines;
   }
-  
+
   public void setLines(String[] lines) {
     this.lines = lines;
   }
-  
+
   public Rectangle getBox() {
     return box;
   }

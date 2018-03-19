@@ -1,26 +1,31 @@
 package com.adviser.imgsrc;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+public class RenderPixel implements Render {
 
-public class PixelRender implements  Render {
+  private static final Logger LOGGER = LoggerFactory.getLogger(RenderPixel.class);
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(PixelRender.class);
-
+  public final Format format;
   public BufferedImage image;
 
+  RenderPixel(Format format) {
+    this.format = format;
+  }
+
   public Graphics2D getGraphics2D(int width, int height, int colorSpace) {
-    LOGGER.info("PixelSize:{}x{}", width, height);
+//    LOGGER.info("PixelSize:{}x{}", width, height);
     this.image = new BufferedImage(width, height, colorSpace);
     return image.createGraphics();
   }
 
-  public ByteArrayOutputStream getStream(Format format) throws IOException {
+  public ByteArrayOutputStream getStream() throws IOException {
     ByteArrayOutputStream ret = new ByteArrayOutputStream();
     javax.imageio.ImageIO.write(this.image, format.getFormat(), ret);
     return ret;

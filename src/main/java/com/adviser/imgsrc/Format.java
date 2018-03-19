@@ -1,9 +1,5 @@
 package com.adviser.imgsrc;
 
-import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -17,10 +13,11 @@ abstract class Format {
 
   public abstract int getColorSpace();
 
-  public abstract Graphics2D getGraphics2D(int width, int height, int colorSpace);
-
-  public abstract ByteArrayOutputStream getStream() throws IOException;
-  
+  public abstract Render createRender();
+//  public abstract Graphics2D getGraphics2D(int width, int height, int colorSpace);
+//
+//  public abstract ByteArrayOutputStream getStream() throws IOException;
+//
   //private String cleanPath;
 
   private static Map<String, Format> formatFactory = null;

@@ -1,10 +1,6 @@
 package com.adviser.imgsrc;
 
-import java.util.Deque;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Pattern;
 
 
@@ -23,7 +19,7 @@ public class Steps<T> {
   }
 
   private static final Pattern RESPLIT = Pattern.compile("/+");
-  
+
   public static Deque<String> splitPath(String path) {
     String[] paths = RESPLIT.split(path, 0);
     Deque<String> datas = new LinkedList<String>();
@@ -32,7 +28,7 @@ public class Steps<T> {
       if (data.trim().isEmpty()) {
         continue;
       }
-      datas.add(data);    
+      datas.add(data);
     }
     return datas;
   }
@@ -40,7 +36,7 @@ public class Steps<T> {
   public void parse(T ref, Deque<String> datas) {
     Step<T> step = steps.getFirst();
     Iterator<String> i = datas.iterator();
-    while(step != null && i.hasNext()) {
+    while (step != null && i.hasNext()) {
       String path = i.next();
       if (path == null) {
         break;

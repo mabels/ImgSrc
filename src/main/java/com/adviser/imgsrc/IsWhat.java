@@ -1,6 +1,6 @@
 package com.adviser.imgsrc;
 
-import java.awt.Color;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.Random;
 import java.util.regex.Pattern;
@@ -24,7 +24,7 @@ public class IsWhat {
   private static final int RRBIT = 16;
   private static final int GGBIT = 8;
   private static final int BBBIT = 0;
-  
+
   private Integer colorSpace = null;
 
   public boolean assignBackColor(Image img) {

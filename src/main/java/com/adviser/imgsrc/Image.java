@@ -1,24 +1,16 @@
 package com.adviser.imgsrc;
 
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.Graphics2D;
-import java.awt.Rectangle;
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.management.RuntimeErrorException;
+import java.awt.*;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Deque;
-import java.util.Enumeration;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import javax.management.RuntimeErrorException;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class Image {
   @SuppressWarnings("unused")
@@ -38,26 +30,23 @@ public class Image {
 
   private Format format = null;
 
-  public void setWait(Enumeration<String> o) {
+  public void setWait(String o) {
     // LOGGER.debug("setWait:"+o);
     if (o == null) {
       return;
     }
-    while (o.hasMoreElements()) {
-      final String str = o.nextElement();
+    final String str = o;
+    try {
+      wait = Integer.parseInt(str);
+    } catch (Exception e) {
+      String[] s = str.split(":");
       try {
-        wait = Integer.parseInt(str);
-        break;
-      } catch (Exception e) {
-        String[] s = str.split(":");
-        try {
-          int begin = Integer.parseInt(s[0]);
-          int end = Integer.parseInt(s[1]);
-          int diff = Math.abs(begin - end);
-          wait = (int) (Math.random() * diff) + begin;
-        } catch (Exception e1) {
-          wait = (int) (Math.random() * 1000);
-        }
+        int begin = Integer.parseInt(s[0]);
+        int end = Integer.parseInt(s[1]);
+        int diff = Math.abs(begin - end);
+        wait = (int) (Math.random() * diff) + begin;
+      } catch (Exception e1) {
+        wait = (int) (Math.random() * 1000);
       }
     }
   }
@@ -117,7 +106,7 @@ public class Image {
     private final String ratio;
 
     public AspectRatio(String fullName, String shortName, String ratio,
-        String regEx) {
+                       String regEx) {
       this.fullName = fullName;
       this.shortName = shortName;
       this.regEx = Pattern.compile(regEx);
@@ -291,19 +280,15 @@ public class Image {
     return "" + width + "x" + height;
   }
 
-  public ByteArrayOutputStream getStream() throws IOException {
-    return getFormat().getStream();
-  }
-
-
-  public Graphics2D drawImage() throws UnsupportedEncodingException {
+  public Graphics2D drawImage(Render render) throws UnsupportedEncodingException {
     if (width > MAXDIM || height > MAXDIM) {
       throw new RuntimeErrorException(new Error("Image too big max 4096x4096:"
           + width + "x" + height));
     }
     // System.err.println("XXXX:"+this.getColorSpace()+":"+this.getFormat().getMime());
 
-    final Graphics2D graph = getFormat().getGraphics2D(width, height, this.getColorSpace());
+    final Graphics2D graph = render.getGraphics2D(width, height,
+        this.getFormat().getColorSpace());
 
     if (this.isFrame()) {
       graph.setPaint(textcolor);
@@ -319,7 +304,7 @@ public class Image {
       graph.fillRect(0, 0, width, height);
     }
     graph.setColor(textcolor);
-    
+
     final Font font = new Font("Sans-Serif", Font.PLAIN, 10/* const */);
     final FitBox fitBox = new FitBox(graph, font);
     fitBox.setLines(this.getText());
@@ -412,4 +397,5 @@ public class Image {
   public void setColorSpace(int colorSpace) {
     this.colorSpace = colorSpace;
   }
+
 }
