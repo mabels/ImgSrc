@@ -22,7 +22,7 @@ provider:
   runtime: java8
 
 # you can overwrite defaults here
-#  stage: dev
+  stage: imgsrc
   region: eu-west-1
 
 # you can add statements to the Lambda function's IAM Role here
@@ -47,17 +47,18 @@ provider:
 
 # you can add packaging information here
 package:
-  artifact: target/imgsrc-1.0.1.jar
+  artifact: target/imgsrc-1.0.2.jar
 
 functions:
-  hello:
+  r:
     handler: com.adviser.imgsrc.aws.Handler
     events:
     - http: 
-        path: /{thepath+}
+        path: /
         method: GET
-        cors: true
-        contentHandling: CONVERT_TO_BINARY
+    - http: 
+        path: /{proxy+}
+        method: GET
 
 plugins:
  - serverless-apigw-binary
@@ -65,10 +66,8 @@ plugins:
 custom:
   apigwBinary:
     types:           #list of mime-types
-      - 'image/png'
-      - 'image/jpeg'
-      - 'image/ico'
-      - 'text/html'
+      - '*/*'
+
 
 #    The following are a few example events you can configure
 #    NOTE: Please make sure to change your handler code to work with those events

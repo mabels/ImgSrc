@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -22,6 +23,7 @@ public class Handler implements RequestHandler<Map<String, Object>, ApiGatewayRe
   private final ImgSrc imgSrc;
 
   public Handler() {
+    BasicConfigurator.configure();
     this.imgSrc = new ImgSrc();
     try {
       imgSrc.init();
@@ -33,7 +35,10 @@ public class Handler implements RequestHandler<Map<String, Object>, ApiGatewayRe
 
   @Override
   public ApiGatewayResponse handleRequest(final Map<String, Object> input, Context context) {
-    BasicConfigurator.configure();
+    // LOGGER.info(input.get("path").getClass().getCanonicalName());
+    // input.forEach((String k, Object o) -> {
+      // LOGGER.info("input:{}:{}", k, o, o.getClass().getCanonicalName());
+    // });
     final ApiGatewayResponse.Builder response = ApiGatewayResponse.builder();
     final Map<String, String> headers = new HashMap<>();
     final ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -45,17 +50,24 @@ public class Handler implements RequestHandler<Map<String, Object>, ApiGatewayRe
 
       @Override
       public String getPath() {
-        return (String) input.get("path");
+        String path = (String)input.get("path");
+        // LOGGER.info("getPath:{}", path);
+        return path;
+        // final Map<String, String> h = (Map)input.get("path");
+        // final String path = "/" + h.get("thepath");
+        // return path;
       }
     }, new SimpleResponse() {
 
       @Override
       public void setHeader(String k, String v) {
+        // LOGGER.info("setHeader:{},{}", k, v);
         headers.put(k, v);
       }
 
       @Override
       public void setStatus(int code) {
+        // LOGGER.info("setStatus:{}", code);
         response.setStatusCode(code);
       }
 
@@ -68,11 +80,16 @@ public class Handler implements RequestHandler<Map<String, Object>, ApiGatewayRe
       public void done(boolean state) {
       }
     });
-    return response.setStatusCode(200)
-        .setRawBody(baos.toByteArray())
-        .setBase64Encoded(false)
-        .setHeaders(headers)
-        .build();
+    if (headers.get("content-type").startsWith("text")) {
+      try {
+        response.setStringBody(baos.toString("utf-8"));
+      } catch (Exception e) {
+        response.setStringBody(baos.toString());
+      }
+    } else {
+      response.setBinaryBody(baos.toByteArray());
+    }
+    return response.setHeaders(headers).build();
   }
 
 }

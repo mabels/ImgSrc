@@ -15,54 +15,58 @@ import javax.servlet.http.HttpServletResponse;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.*;
+import java.math.BigInteger;
+import java.security.MessageDigest;
 
 
 public final class ImgSrc {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ImgSrc.class);
 
-  private Cache<String, ByteArrayOutputStream> ehcache;
+  public static class CachedImage {
+    public final String etag;
+    public final byte[] bytes;
+    public CachedImage(byte[] bytes) {
+      String etag = null;
+      try {
+        MessageDigest md = MessageDigest.getInstance("MD5");
+        byte[] thedigest = md.digest(bytes);
+        BigInteger bigInt = new BigInteger(1, thedigest);
+        etag = bigInt.toString(62);
+      } catch (Exception e) {
+      }
+      this.etag = etag;
+      this.bytes = bytes;
+    }
+  }
+
+  private Cache<String, CachedImage> ehcache;
 
   public void init() throws Exception {
     final CacheManager manager = CacheManagerBuilder.newCacheManagerBuilder()
         .withCache("ImageCache",
             CacheConfigurationBuilder.newCacheConfigurationBuilder(String.class,
-                ByteArrayOutputStream.class,
+                CachedImage.class,
                 ResourcePoolsBuilder.newResourcePoolsBuilder()
                     .heap(4096, EntryUnit.ENTRIES)
-//                    .with(new ResourcePool() {
-//                      @Override
-//                      public ResourceType<?> getType() {
-//                        return ResourceType.Core.HEAP;
-//                      }
-//
-//                      @Override
-//                      public boolean isPersistent() {
-//                        return false;
-//                      }
-//
-//                      @Override
-//                      public void validateUpdate(ResourcePool resourcePool) {
-//
-//                      }
-//                    })
-            ))
-        .build();
+            )).build();
     manager.init();
-    ehcache = manager.getCache("ImageCache", String.class, ByteArrayOutputStream.class);
+    ehcache = manager.getCache("ImageCache", String.class, CachedImage.class);
   }
 
 
-  public ByteArrayOutputStream cachedProcessing(Image image) throws IOException {
+  public CachedImage cachedProcessing(Image image) throws IOException {
     final String fp = image.getFullPath();
-    ByteArrayOutputStream os = ehcache.get(fp);
+    CachedImage os = ehcache.get(fp);
     if (os == null) {
-      LOGGER.info("create cache Entry:{}", fp);
-      final Render render = image.getFormat().createRender();
-      image.drawImage(render);
-      os = render.getStream();
+      synchronized (ehcache) {
+        LOGGER.info("create cache Entry:{}", fp);
+        final Render render = image.getFormat().createRender();
+        image.drawImage(render);
+        os = new CachedImage(render.getStream().toByteArray());
 //      element = new Element(image, out);
-      ehcache.put(fp, os);
+        ehcache.put(fp, os);
+      }
     }
     return os;
   }
@@ -130,14 +134,17 @@ public final class ImgSrc {
         } else {
           setCacheHeaders(response);
         }
-        ByteArrayOutputStream img = cachedProcessing(image);
-        response.setHeader("content-length", String.valueOf(img.size()));
-        img.writeTo(response.getOutputStream());
+        CachedImage cimg = cachedProcessing(image);
+        response.setHeader("content-length", String.valueOf(cimg.bytes.length));
+        if (cimg.etag != null) {
+          response.setHeader("etag", cimg.etag);
+        }
+        response.getOutputStream().write(cimg.bytes);
       }
       response.done(true);
     } catch (Exception e) {
-      LOGGER.error("error:{}", e);
-      response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+      // LOGGER.error("error:{}", e.m);
+      response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
       final StringWriter sw = new StringWriter();
       final PrintWriter pw = new PrintWriter(sw);
       e.printStackTrace(pw);
@@ -151,36 +158,44 @@ public final class ImgSrc {
     }
   }
 
-  private static byte[][] testHtmlCache = {null};
 
-  public static void testHtml(SimpleResponse resp) {
-    synchronized (testHtmlCache) {
-      if (testHtmlCache[0] == null) {
-        final InputStream is = ImgSrc.class.getClassLoader()
-            .getResourceAsStream("test.html");
-        try {
-          testHtmlCache[0] = IOUtils.toString(is, "utf-8").getBytes();
-        } catch (Exception e) {
-          testHtmlCache[0] = "VersionError".getBytes();
-        }
-//        LOGGER.debug("FETCH test.html");
+  public void testHtml(SimpleResponse resp) {
+    CachedImage os = ehcache.get("/test.html");
+    if (os == null) {
+      final InputStream is = ImgSrc.class.getClassLoader().getResourceAsStream("test.html");
+      synchronized (ehcache) {
+          os = ehcache.get("/test.html");
+          if (os == null) {
+            LOGGER.info("create cache Entry:/test.html");
+            byte[] text;
+            try {
+              text = IOUtils.toString(is, "utf-8").getBytes();
+            } catch (Exception e) {
+              text = "VersionError".getBytes();
+            }
+            os = new CachedImage(text);
+            ehcache.put("/test.html", os);
+          }
       }
     }
     resp.setStatus(HttpServletResponse.SC_OK);
-    resp.setHeader("Content-Type", "text/html;charset=utf-8");
+    resp.setHeader("content-type", "text/html;charset=utf-8");
+    resp.setHeader("etag", os.etag);
     try {
-      resp.getOutputStream().write(testHtmlCache[0]);
+      resp.getOutputStream().write(os.bytes);
     } catch (Exception e) {
       LOGGER.error("OutputStreamWriteError:{}", e);
     }
   }
 
   private void setNoCacheHeaders(SimpleResponse out) {
-    out.setHeader("cache-control", "no-cache");
-    out.setHeader("pragma", "no-cache");
+    out.setHeader("cache-control", "public, max-age=0");
+    out.setHeader("last-modified", "Tue, 01 Jan 1980 00:00:00 GMT");
   }
 
   private void setCacheHeaders(SimpleResponse out) {
+    out.setHeader("cache-control", "public, max-age=0");
+    out.setHeader("last-modified", "Tue, 01 Jan 1980 00:00:00 GMT");
 //    out.setHeader("cache-control", "max-age=315360000");
 //    out.setHeader("expires", "Thu, 31 Dec 2037 23:55:55 GMT");
   }
