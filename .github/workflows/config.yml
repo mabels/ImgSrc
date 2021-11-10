@@ -22,7 +22,10 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
-    - name: Build - Test
+    - name: Build - Test 
       run: |
          mvn package -no-transfer-progress
+
+    - name: Build - Test Docker
+      run: |
          docker build .
