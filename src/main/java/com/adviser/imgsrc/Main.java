@@ -13,9 +13,10 @@ import org.eclipse.jetty.util.thread.QueuedThreadPool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -47,12 +48,15 @@ public class Main {
       } catch (Exception e) {
         LOGGER.error("Init failed");
       }
-      LOGGER.info("Version:" + imgSrc.getServerVersion());
+      LOGGER.info("Version:" + ImgSrc.getServerVersion());
     }
 
-    public void handle(final String path, final Request baseRequest, final HttpServletRequest request,
-                       final HttpServletResponse response) throws IOException, ServletException {
-
+    @Override
+    public void handle(final String path,
+                       final Request baseRequest,
+                       final HttpServletRequest request,
+                       final HttpServletResponse response) 
+                       throws IOException, ServletException {
       this.imgSrc.handleRequest(new SimpleRequest() {
         @Override
         public String getHeader(String key) {
@@ -91,6 +95,8 @@ public class Main {
         }
       });
     }
+
+    
   }
 
   public static class ImgSrcConfig {
@@ -191,7 +197,7 @@ public class Main {
 
     HttpConfiguration https = new HttpConfiguration();
     https.addCustomizer(new SecureRequestCustomizer());
-    SslContextFactory sslContextFactory = new SslContextFactory();
+    SslContextFactory.Server sslContextFactory = new SslContextFactory.Server();
     sslContextFactory.setKeyStore(createKeyStorePem(imgSrcConfig));
     sslContextFactory.setKeyStorePassword("imgSrcGeheim");
 
@@ -223,7 +229,7 @@ public class Main {
 //    keystore.store(fos, "imgSrcGeheim".toCharArray());
 //    keystore.load(null, null);
 
-    SslContextFactory sslContextFactory = new SslContextFactory();
+    SslContextFactory.Server sslContextFactory = new SslContextFactory.Server();
     sslContextFactory.setKeyStore(createKeyStorePem(imgSrcConfig));
     sslContextFactory.setKeyStorePassword("imgSrcGeheim");
 

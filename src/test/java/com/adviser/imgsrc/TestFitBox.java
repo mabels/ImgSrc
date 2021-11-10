@@ -1,8 +1,6 @@
 package com.adviser.imgsrc;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.awt.Font;
 import java.awt.Graphics2D;
@@ -11,14 +9,17 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.Before;
-import org.junit.Test;
+import javax.management.RuntimeErrorException;
+
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static org.hamcrest.CoreMatchers.allOf;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.lessThan;
+import static org.hamcrest.MatcherAssert.assertThat;
+
 
 public class TestFitBox {
 
@@ -28,11 +29,18 @@ public class TestFitBox {
   private Graphics2D graph;
   private Font font;
 
-  @Before
+  TestFitBox() {
+    this.imageContext();
+  }
+
   public void imageContext() {
-    image = new BufferedImage(100, 100, BufferedImage.TYPE_INT_RGB);
-    graph = image.createGraphics();
-    font = new Font("Sans-Serif", Font.PLAIN, 100);
+    this.image = new BufferedImage(100, 100, BufferedImage.TYPE_INT_RGB);
+    this.graph = image.createGraphics();
+    this.font = new Font("Sans-Serif", Font.PLAIN, 10);
+    // System.err.println("XXXXXXXX"+font);
+    if (this.font == null) {
+      throw new RuntimeErrorException(new Error("Font not found:"));
+    }
   }
 
   private static final int[] refSizes1Line = { 299, 258, 179, 130, 112, 100,
@@ -49,6 +57,7 @@ public class TestFitBox {
   @Test
   public void testHorizontal1Line() {
     final String text = "Sucht macht doof arbeit der sack ist doof oder vielleicht auch nicht macht doof leben heut ist kein guter tag macht doof und es ist nicht langweilig warum wird da bloss nix drauss";
+    System.err.println("UUUUUUU"+font);
     FitBox fitbox = new FitBox(graph, font);
     fitbox.setBox(new Rectangle(30, 30, 300, 300));
     StringBuilder sb = new StringBuilder(); // generate reference array
@@ -81,7 +90,7 @@ public class TestFitBox {
 
   @Test
   public void testHorizontal1EmptyString() {
-    FitBox fitbox = new FitBox(graph, font);
+    FitBox fitbox = new FitBox(graph, this.font);
     fitbox.setLines(new String[] { "", "" });
     fitbox.setBox(new Rectangle(30, 30, 300, 300));
     int fontSize = fitbox.findHorizontalFontsize();
@@ -95,7 +104,7 @@ public class TestFitBox {
     for (int i = 0; i < line1.length(); ++i) {
       widestLine.append("G"); // uppercase G are usally the widest chars
     }
-    FitBox fitbox = new FitBox(graph, font);
+    FitBox fitbox = new FitBox(graph, this.font);
     fitbox.setBox(new Rectangle(30, 30, 300, 300));
     StringBuilder sb = new StringBuilder(); // generate reference array
     sb.append("{");
@@ -117,7 +126,7 @@ public class TestFitBox {
 
   @Test
   public void testLinesNotSet() {
-    FitBox fitbox = new FitBox(graph, font);
+    FitBox fitbox = new FitBox(graph, this.font);
     fitbox.setBox(new Rectangle(30, 30, FitBox.MINIMUMFONTSIZE, 300));
     assertEquals(FitBox.TEXTTOOSMALL, fitbox.findBoxFontsize());
     assertEquals(FitBox.TEXTTOOSMALL, fitbox.findHorizontalFontsize());
@@ -126,7 +135,7 @@ public class TestFitBox {
 
   @Test
   public void testLinesEmpty() {
-    FitBox fitbox = new FitBox(graph, font);
+    FitBox fitbox = new FitBox(graph, this.font);
     fitbox.setBox(new Rectangle(30, 30, FitBox.MINIMUMFONTSIZE, 300));
     fitbox.setLines(new String[0]);
     assertEquals(FitBox.TEXTTOOSMALL, fitbox.findBoxFontsize());
@@ -136,7 +145,7 @@ public class TestFitBox {
 
   @Test
   public void testBoxNotSet() {
-    FitBox fitbox = new FitBox(graph, font);
+    FitBox fitbox = new FitBox(graph, this.font);
     fitbox.setLines(new String[] { "" });
     try {
       fitbox.findHorizontalFontsize();

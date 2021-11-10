@@ -9,7 +9,6 @@ import com.microsoft.azure.serverless.functions.HttpRequestMessage;
 import com.microsoft.azure.serverless.functions.HttpResponseMessage;
 import com.microsoft.azure.serverless.functions.annotation.AuthorizationLevel;
 import com.microsoft.azure.serverless.functions.annotation.FunctionName;
-import com.microsoft.azure.serverless.functions.annotation.HttpOutput;
 import com.microsoft.azure.serverless.functions.annotation.HttpTrigger;
 
 import java.io.ByteArrayOutputStream;
@@ -40,14 +39,14 @@ public class Handler {
           HttpRequestMessage<Optional<String>> request,
       final ExecutionContext context) {
 
-    if (this.imgSrc == null) {
+    if (Handler.imgSrc == null) {
       synchronized (this) {
-        this.imgSrc = new ImgSrc();
+        Handler.imgSrc = new ImgSrc();
         try {
           imgSrc.init();
-          context.getLogger().info("Version:" + imgSrc.getServerVersion());
+          context.getLogger().info("Version:" + ImgSrc.getServerVersion());
         } catch (Exception e) {
-          context.getLogger().severe("ErrorVersion:" + imgSrc.getServerVersion());
+          context.getLogger().severe("ErrorVersion:" + ImgSrc.getServerVersion());
         }
       }
     }

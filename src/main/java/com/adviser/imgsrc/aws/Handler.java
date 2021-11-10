@@ -26,9 +26,9 @@ public class Handler implements RequestHandler<Map<String, Object>, ApiGatewayRe
     this.imgSrc = new ImgSrc();
     try {
       imgSrc.init();
-      LOGGER.info("Version:" + imgSrc.getServerVersion());
+      LOGGER.info("Version:" + ImgSrc.getServerVersion());
     } catch (Exception e) {
-      LOGGER.error("ErrorVersion:" + imgSrc.getServerVersion());
+      LOGGER.error("ErrorVersion:" + ImgSrc.getServerVersion());
     }
   }
 
