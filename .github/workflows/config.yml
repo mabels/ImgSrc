@@ -24,4 +24,5 @@ jobs:
 
     - name: Build - Test
       run: |
-         mvn package
+         mvn package -no-transfer-progress
+         docker build .

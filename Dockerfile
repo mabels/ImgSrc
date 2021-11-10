@@ -11,8 +11,8 @@ COPY src /app/build/src
 RUN apk update && \
     apk add maven && \
     apk add ttf-dejavu && \
-    (cd /app/build && mvn package && cp target/imgsrc*.jar /app/imgsrc.jar) && \
-    rm -rf /app/build
+    (cd /app/build && mvn package -no-transfer-progress && cp target/imgsrc*.jar /app/imgsrc.jar) && \
+    rm -rf /app/build $HOME/.m2
 
 #COPY cert.pem chain.pem fullchain.pem privkey.pem /app/
 
