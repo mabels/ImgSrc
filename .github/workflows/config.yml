@@ -26,6 +26,9 @@ jobs:
       run: |
          mvn package -no-transfer-progress
 
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v2
+
     - name: Build - Test Docker
       run: |
-         docker build .
+         docker buildx build .
